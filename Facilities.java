@@ -1,0 +1,7 @@
+/**
+ * Facilities
+ */
+public class Facilities {
+
+	
+}
