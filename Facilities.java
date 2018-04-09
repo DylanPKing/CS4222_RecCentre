@@ -1,7 +1,0 @@
-/**
- * Facilities
- */
-public class Facilities {
-
-	
-}
