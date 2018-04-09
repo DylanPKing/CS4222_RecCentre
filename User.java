@@ -3,10 +3,10 @@
  */
 public class User {
 
-	public int userID;
-	public String email;
-	public String password;
-	public int userType;
+	private int userID;
+	private String email;
+	private String password;
+	private int userType;
 
 	User(int userID, String email, String password, int userType) {
 		this.userID = userID;
