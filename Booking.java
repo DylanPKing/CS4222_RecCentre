@@ -2,7 +2,7 @@
  * Booking
  */
 public class Booking
- {
+{
 	private int bookingID;
 	private int facilityID;
 	private int userID;
@@ -10,7 +10,7 @@ public class Booking
 	private int slotNumber;
 	private boolean paymentStatus;
 
-	booking(int bookingID, int facilityID, int userID, Date bookingDate, int slotNumber, boolean paymentStatus)
+	Booking(int bookingID, int facilityID, int userID, Date bookingDate, int slotNumber, boolean paymentStatus)
 	{
 		this.bookingID = bookingID;
 		this.facilityID = facilityID;
