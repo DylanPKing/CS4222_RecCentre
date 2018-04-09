@@ -1,9 +1,15 @@
 /**
  * RecCentre
  */
+<<<<<<< HEAD
  import java.util.*;			//Scanner and the such
  import javax.swing.*;		//JOptionPane   +   JTextArea
  import java.io.*;				// IOException  +  Files
+=======
+import java.util.*;			
+import javax.swing.*;		//JOptionPane   +   JTextArea
+import java.io.*;				// IOException  +  Files
+>>>>>>> Dylan
 public class RecCentre
 {
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
@@ -20,7 +26,32 @@ public class RecCentre
 
 	public static boolean login()
 	{
-		
+		String email, password;
+		int attempt;
+		boolean found = false;
+		String emailMsg = "Enter your email address:";
+		String passMsg = "Enter your password:";
+		for (attempt = 0; attempt < 3 && !found; attempt++)
+		{
+			email = JOptionPane.showInputDialog(null, emailMsg, "Enter userame",
+					JOptionPane.PLAIN_MESSAGE);
+			password = JOptionPane.showInputDialog(null, passMsg, "Enter password",
+				   	   JOptionPane.PLAIN_MESSAGE);
+			for (int i = 0; i < users.size() && !found; i++)
+			{
+				if (users.get(i).getEmail().equals(email) && users.get(i).getPassword().equals(password))
+				{
+					found = true;
+				}
+			}
+			if (!found)
+			{
+				emailMsg = "Invalid credentials. You have " + (3 - (attempt + 1)) +
+						   " attempts remaining. Please enter email again:";
+				passMsg = "Please enter password again";
+			}
+		}
+		return found;
 	}
 
 	public static void generatePassword()
