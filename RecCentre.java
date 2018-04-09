@@ -1,15 +1,9 @@
 /**
  * RecCentre
  */
-<<<<<<< HEAD
- import java.util.*;			//Scanner and the such
- import javax.swing.*;		//JOptionPane   +   JTextArea
- import java.io.*;				// IOException  +  Files
-=======
-import java.util.*;			
-import javax.swing.*;		//JOptionPane   +   JTextArea
-import java.io.*;				// IOException  +  Files
->>>>>>> Dylan
+import java.util.*;			// Scanner
+import javax.swing.*;		// JOptionPane   +   JTextArea
+import java.io.*;			// IOException  +  Files
 public class RecCentre
 {
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
