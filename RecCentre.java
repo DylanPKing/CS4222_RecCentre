@@ -18,6 +18,11 @@ public class RecCentre
 		}
 	}
 
+	/**
+	 * Takes in an email and password from the user, and checks it against
+	 * the existing user objects.
+	 * @return true if valid login
+	 */
 	public static boolean login()
 	{
 		String email, password;
