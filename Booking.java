@@ -25,7 +25,7 @@ public class Booking
 		this.bookingID = bookingID;
 	}
 	
-	public int getBookingID
+	public int getBookingID()
 	{
 		return bookingID;
 	}
@@ -35,7 +35,7 @@ public class Booking
 		this.facilityID = facilityID;
 	}
 	
-	public int getFacilityID
+	public int getFacilityID()
 	{
 		return facilityID;
 	}
@@ -45,7 +45,7 @@ public class Booking
 		this.userID = userID;
 	}
 	
-	public int getUserID
+	public int getUserID()
 	{
 		return userID;
 	}
@@ -55,7 +55,7 @@ public class Booking
 		this.bookingDate = bookingDate;
 	}
 	
-	public Date getBookingDate
+	public Date getBookingDate()
 	{
 		return bookingDate;
 	}
@@ -65,7 +65,7 @@ public class Booking
 		this.slotNumber = slotNumber;
 	}
 	
-	public int getSlotNumber
+	public int getSlotNumber()
 	{
 		return slotNumber;
 	}
@@ -75,7 +75,7 @@ public class Booking
 		this.paymentStatus = paymentStatus;
 	}
 	
-	public boolean getPaymentStatus
+	public boolean getPaymentStatus()
 	{
 		return paymentStatus;
 	}
