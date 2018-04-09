@@ -38,6 +38,11 @@ public class RecCentre
 		boolean paymentStatus = false;
 		
 		File input2 = new File("Users.txt");
+		int userId;
+		String email;
+		String password;
+		int userType;
+		
 		File input3 = new File("Facilities.txt");
 		Scanner in = new Scanner(input1);
 		String [] lineFromFile;
@@ -66,8 +71,13 @@ public class RecCentre
 			{
 				while(in.hasNext())
 				{
-					//tempUser = in.nextLine();
-					//users.add(tempUser);
+					lineFromFile = (in.nextLine().split(","));
+					userId = Integer.parseInt(lineFromFile[0]);
+					email = lineFromFile[1];
+					password = lineFromFile[2];
+					userType = Integer.parseInt(lineFromFile[3]);
+					User newUser = new User(userId, email, password, userType);
+					users.add(newUser);
 				}
 			}
 			in.close();
