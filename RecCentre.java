@@ -30,20 +30,34 @@ public class RecCentre
 	public static void fillArrayLists() throws IOException
 	{
 		File input1 = new File("Bookings.txt");
+		int bookingID = 0;
+		int facilityID = 0;
+		int userID = 0;
+		//Date bookingDate;
+		int slotNumber = 0;
+		boolean paymentStatus = false;
+		
 		File input2 = new File("Users.txt");
 		File input3 = new File("Facilities.txt");
 		Scanner in = new Scanner(input1);
-		Booking tempBooking;
-		User tempUser;
-		Facility tempFacility;
+		String [] lineFromFile;
+		String test = "";
 		if(input1.exists() && input2.exists() && input3.exists())
 		{
 			if(input1.length() != 0)
 			{
 				while(in.hasNext())
 				{
-				//	tempBooking = in.nextLine();
-					//bookings.add(tempBooking);
+					lineFromFile = (in.nextLine().split(","));
+					bookingID = Integer.parseInt(lineFromFile[0]);
+					facilityID = Integer.parseInt(lineFromFile[1]);
+					userID = Integer.parseInt(lineFromFile[2]);
+					//bookingDate =						figure this out later
+					slotNumber = Integer.parseInt(lineFromFile[4]);
+					test = lineFromFile[5];
+					paymentStatus = checkIfPaid(test);
+					Booking reservation = new Booking(bookingID, facilityID, userID, /*bookingDate,*/ slotNumber, paymentStatus);
+					bookings.add(reservation);
 				}
 			}
 			in.close();
@@ -73,4 +87,16 @@ public class RecCentre
 			JOptionPane.showMessageDialog(null, "One or more files don't exist", "Error", 2);
 		}
 	}
+	
+	public static boolean checkIfPaid(String test)
+	{
+		boolean paid = false;
+		if(test.equals("true"))
+		{
+			paid = true;
+		}
+		return paid;
+	}
+	
+	
 }
