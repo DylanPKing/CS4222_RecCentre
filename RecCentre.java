@@ -11,9 +11,10 @@ public class RecCentre
 	public static ArrayList<User> users = new ArrayList<User>();
 	public static void main(String[] args) throws IOException
 	{
+		fillArrayLists();
 		if(login())
 		{
-			fillArrayLists();
+			
 		}
 	}
 
@@ -44,6 +45,11 @@ public class RecCentre
 		int userType;
 		
 		File input3 = new File("Facilities.txt");
+		int facilityId;
+		String facilityName;
+		double pricePerHour;
+		//Date decommissionedUntilDate;
+		
 		Scanner in = new Scanner(input1);
 		String [] lineFromFile;
 		String test = "";
@@ -86,8 +92,20 @@ public class RecCentre
 			{
 				while(in.hasNext())
 				{
-				//	tempFacility = in.nextLine();
-					//facilities.add(tempFacility);
+					lineFromFile = (in.nextLine().split(","));
+					facilityId = Integer.parseInt(lineFromFile[0]);
+					facilityName = lineFromFile[1];
+					pricePerHour = Double.parseDouble(lineFromFile[2]);
+					if(lineFromFile.length == 3)
+					{
+						Facility newFacility = new Facility(facilityId, facilityName, pricePerHour);
+					}
+					else
+					{
+						//decommissionedUntilDate = 				figure this out later
+						Facility newFacility = new newFacility(facilityId, facilityName, pricePerHour, /*decommissionedUntilDate*/);
+					}
+					facilities.add(newFacility);
 				}
 			}
 			in.close();
