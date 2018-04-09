@@ -1,7 +1,8 @@
 /**
  * Facility
  */
-public class Facility {
+public class Facility
+{
 
 	
 }

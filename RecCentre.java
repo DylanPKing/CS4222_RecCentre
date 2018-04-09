@@ -1,9 +1,11 @@
 /**
  * RecCentre
  */
-public class RecCentre {
+public class RecCentre
+{
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		
 	}
 }
