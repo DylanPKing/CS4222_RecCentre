@@ -53,9 +53,40 @@ public class RecCentre
 		return found;
 	}
 
-	public static void generatePassword()
+	/**
+	 * Takes in a user chosen by the administrator, and generates
+	 * a random password between 8 and 50 characters, specified by
+	 * the administrator, and writes it to the Users object.
+	 * @param User
+	 */
+	public static void generatePassword(User newUser)
 	{
-		
+		boolean validLength = false;
+		String strPassLength, diagText = "Please enter length of password:\n" +
+										 "Must be between 8 and 50 characters.";
+		int passLength;
+		while (!validLength)
+		{
+			strPassLength = JOptionPane.showInputDialog(null, diagText, "Enter length", JOptionPane.PLAIN_MESSAGE);
+			if (strPassLength.matches("[0-9]{8,50}"))
+			{
+				passLength = Integer.parseInt(strPassLength);
+				validLength = true;
+			}
+			else
+			{
+				diagText = "Invalid input. Please enter a number between 8 and 50.";
+			}
+		}
+		String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
+		String password = "";
+		int poolChosen;
+		for (int i = 0; i < passLength; i++)
+		{
+			poolChosen = (int)(Math.random() * passwordPoo.length);
+			password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+		}
+		newUser.setPassword(password);
 	}
 	
 	/**
