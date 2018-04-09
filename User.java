@@ -14,7 +14,7 @@ public class User
 		this.userID = userID;
 		this.email = email;
 		this.password = password;
-		this.userType = usereType;
+		this.userType = userType;
 	}
 	/**
 	 * @return the userID

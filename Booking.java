@@ -6,16 +6,16 @@ public class Booking
 	private int bookingID;
 	private int facilityID;
 	private int userID;
-	private Date bookingDate;
+	//private Date bookingDate;
 	private int slotNumber;
 	private boolean paymentStatus;
 
-	Booking(int bookingID, int facilityID, int userID, Date bookingDate, int slotNumber, boolean paymentStatus)
+	Booking(int bookingID, int facilityID, int userID, /*Date bookingDate,*/ int slotNumber, boolean paymentStatus)
 	{
 		this.bookingID = bookingID;
 		this.facilityID = facilityID;
 		this.userID = userID;
-		this.bookingDate = bookingDate;
+		//this.bookingDate = bookingDate;
 		this.slotNumber = slotNumber;
 		this.paymentStatus = paymentStatus;
 	}
@@ -49,7 +49,7 @@ public class Booking
 	{
 		return userID;
 	}
-	
+	/*
 	public void setBookingDate(Date bookingDate)
 	{
 		this.bookingDate = bookingDate;
@@ -59,7 +59,7 @@ public class Booking
 	{
 		return bookingDate;
 	}
-	
+	*/
 	public void setSlotNumber(int slotNumber)
 	{
 		this.slotNumber = slotNumber;
