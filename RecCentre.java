@@ -9,6 +9,7 @@ public class RecCentre
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
 	public static ArrayList<Facility> facilities = new ArrayList<Facility>();
 	public static ArrayList<User> users = new ArrayList<User>();
+	public static boolean isAdmin;
 	public static void main(String[] args) throws IOException
 	{
 		fillArrayLists();
@@ -41,6 +42,7 @@ public class RecCentre
 				if (users.get(i).getEmail().equals(email) && users.get(i).getPassword().equals(password))
 				{
 					found = true;
+					isAdmin = users.get(i).getUserType() == 1;
 				}
 			}
 			if (!found)
@@ -57,7 +59,7 @@ public class RecCentre
 	 * Takes in a user chosen by the administrator, and generates
 	 * a random password between 8 and 50 characters, specified by
 	 * the administrator, and writes it to the Users object.
-	 * @param User
+	 * @param newUser
 	 */
 	public static void generatePassword(User newUser)
 	{
