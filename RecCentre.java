@@ -4,6 +4,7 @@
 import java.util.*;			// Scanner
 import javax.swing.*;		// JOptionPane   +   JTextArea
 import java.io.*;			// IOException  +  Files
+import java.time.LocalDate;
 public class RecCentre
 {
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
@@ -106,7 +107,7 @@ public class RecCentre
 		int bookingID = 0;															// Variables that correspond to the data fields of 
 		int facilityID = 0;															// the Booking type objects
 		int userID = 0;
-		//Date bookingDate;
+		LocalDate bookingDate;
 		int slotNumber = 0;
 		boolean paymentStatus = false;
 		
@@ -124,7 +125,8 @@ public class RecCentre
 		
 		Scanner in = new Scanner(input1);									// Set up a Booking scanner
 		
-		String [] lineFromFile;														// Variables for storage and splitting
+		String [] lineFromFile;	
+		String [] dateFromFile;													// Variables for storage and splitting
 		String test = "";
 		
 		if(input1.exists() && input2.exists() && input3.exists())	// Check if the text files exist first
@@ -137,11 +139,14 @@ public class RecCentre
 					bookingID = Integer.parseInt(lineFromFile[0]);	// Fill data field variables with their respective information
 					facilityID = Integer.parseInt(lineFromFile[1]);
 					userID = Integer.parseInt(lineFromFile[2]);
-					//bookingDate =						figure this out later
+					dateFromFile = lineFromFile[3].split("/");		// Takes the date from file into its own array
+					bookingDate = LocalDate.of(Integer.parseInt(dateFromFile[2]),
+								  Integer.parseInt(dateFromFile[1]), Integer.parseInt(dateFromFile[0]));
+								  // COnverts the date array into an actual date
 					slotNumber = Integer.parseInt(lineFromFile[4]);
 					test = lineFromFile[5];
 					paymentStatus = checkIfPaid(test);						// Need a method for this boolean
-					Booking reservation = new Booking(bookingID, facilityID, userID, /*bookingDate,*/ slotNumber, paymentStatus);		// Create a Booking object with the variables
+					Booking reservation = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paymentStatus);		// Create a Booking object with the variables
 					bookings.add(reservation);									// Add the Booking to the arraylist of Bookings
 				}
 			}
