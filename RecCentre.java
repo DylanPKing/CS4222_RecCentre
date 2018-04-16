@@ -36,21 +36,24 @@ public class RecCentre
 		{
 			email = JOptionPane.showInputDialog(null, emailMsg, "Enter userame",
 					JOptionPane.PLAIN_MESSAGE);
-			password = JOptionPane.showInputDialog(null, passMsg, "Enter password",
-				   	   JOptionPane.PLAIN_MESSAGE);
-			for (int i = 0; i < users.size() && !found; i++)
+			if (email != null)
 			{
-				if (users.get(i).getEmail().equals(email) && users.get(i).getPassword().equals(password))
+				password = JOptionPane.showInputDialog(null, passMsg, "Enter password",
+						JOptionPane.PLAIN_MESSAGE);
+				for (int i = 0; i < users.size() && !found; i++)
 				{
-					found = true;
-					isAdmin = users.get(i).getUserType() == 1;
+					if (users.get(i).getEmail().equals(email) && users.get(i).getPassword().equals(password))
+					{
+						found = true;
+						isAdmin = users.get(i).getUserType() == 1;
+					}
 				}
-			}
-			if (!found)
-			{
-				emailMsg = "Invalid credentials. You have " + (3 - (attempt + 1)) +
-						   " attempts remaining. Please enter email again:";
-				passMsg = "Please enter password again";
+				if (!found)
+				{
+					emailMsg = "Invalid credentials. You have " + (3 - (attempt + 1)) +
+							" attempts remaining. Please enter email again:";
+					passMsg = "Please enter password again";
+				}
 			}
 		}
 		return found;
