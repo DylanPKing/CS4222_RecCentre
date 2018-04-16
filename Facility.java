@@ -1,3 +1,5 @@
+import java.time.*;
+
 /**
  * Facility
  */
@@ -6,7 +8,7 @@ public class Facility
 	private int facilityID;
 	private String facilityName;
 	private double pricePerHour;
-	//private Date decommissionedUntilDate;
+	private LocalDate decommissionedUntilDate;
 	
 	Facility(int facilityID, String facilityName, double pricePerHour)
 	{
@@ -15,12 +17,12 @@ public class Facility
 		this.pricePerHour = pricePerHour;
 	}
 	
-	Facility(int facilityID, String facilityName, double pricePerHour, /*Date decommissionedUntilDate*/)
+	Facility(int facilityID, String facilityName, double pricePerHour, LocalDate decommissionedUntilDate)
 	{
 		this.facilityID = facilityID;
 		this.facilityName = facilityName;
 		this.pricePerHour = pricePerHour;
-		/*this.decommissionedUntilDate = decommissionedUntilDate;*/
+		this.decommissionedUntilDate = decommissionedUntilDate;
 	}
 	
 	public void setFacilityID(int facilityID)
@@ -52,15 +54,14 @@ public class Facility
 	{
 		return pricePerHour;
 	}
-	/*
-	public void setDecommissionedUntilDate(Date decommissionedUntilDate)
+	
+	public void setDecommissionedUntilLocalDate(LocalDate decommissionedUntilDate)
 	{
 		this.decommissionedUntilDate = decommissionedUntilDate;
 	}
 	
-	public Date getDecommissionedUntilDate()
+	public LocalDate getDecommissionedUntilLocalDate()
 	{
 		return decommissionedUntilDate;
 	}
-	*/
 }

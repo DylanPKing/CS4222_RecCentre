@@ -75,21 +75,21 @@ public class RecCentre
 			{
 				passLength = Integer.parseInt(strPassLength);
 				validLength = true;
+				String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
+				String password = "";
+				int poolChosen;
+				for (int i = 0; i < passLength; i++)
+				{
+					poolChosen = (int)(Math.random() * passwordPool.length);
+					password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+				}
+				newUser.setPassword(password);
 			}
 			else
 			{
 				diagText = "Invalid input. Please enter a number between 8 and 50.";
 			}
 		}
-		String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
-		String password = "";
-		int poolChosen;
-		for (int i = 0; i < passLength; i++)
-		{
-			poolChosen = (int)(Math.random() * passwordPoo.length);
-			password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
-		}
-		newUser.setPassword(password);
 	}
 	
 	/**
@@ -121,12 +121,13 @@ public class RecCentre
 		int facilityId;																	// Variables that correspond to the data fields of
 		String facilityName;														// the Facility type objects
 		double pricePerHour;
-		//Date decommissionedUntilDate;
-		
+		LocalDate decommissionedUntilDate;
+		String decomDateString;
+
 		Scanner in = new Scanner(input1);									// Set up a Booking scanner
 		
 		String [] lineFromFile;	
-		String [] dateFromFile;													// Variables for storage and splitting
+		String [] dateElements;													// Variables for storage and splitting
 		String test = "";
 		
 		if(input1.exists() && input2.exists() && input3.exists())	// Check if the text files exist first
@@ -139,9 +140,9 @@ public class RecCentre
 					bookingID = Integer.parseInt(lineFromFile[0]);	// Fill data field variables with their respective information
 					facilityID = Integer.parseInt(lineFromFile[1]);
 					userID = Integer.parseInt(lineFromFile[2]);
-					dateFromFile = lineFromFile[3].split("/");		// Takes the date from file into its own array
-					bookingDate = LocalDate.of(Integer.parseInt(dateFromFile[2]),
-								  Integer.parseInt(dateFromFile[1]), Integer.parseInt(dateFromFile[0]));
+					dateElements = lineFromFile[3].split("/");		// Takes the date from file into its own array
+					bookingDate = LocalDate.of(Integer.parseInt(dateElements[2]),
+								  Integer.parseInt(dateElements[1]), Integer.parseInt(dateElements[0]));
 								  // COnverts the date array into an actual date
 					slotNumber = Integer.parseInt(lineFromFile[4]);
 					test = lineFromFile[5];
@@ -181,10 +182,19 @@ public class RecCentre
 					}
 					else																		// If its 4, then it is decommissioned and has an extra data field
 					{
-						//decommissionedUntilDate = 				figure this out later
-						Facility newFacility = new newFacility(facilityId, facilityName, pricePerHour, /*decommissionedUntilDate*/);		// Create Facility type object
+						decomDateString = JOptionPane.showInputDialog(null, "Please enter a date in the format dd/mm/yyyy");
+						if (decomDateString.matches("[0-9]{2}/[0-9]{1,2}/[0-9]{4}"))
+						{
+							dateElements = decomDateString.split("/");
+							decommissionedUntilDate = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]), Integer.parseInt(dateElements[0]));	// Creats thedate object
+							Facility newFacility = new Facility(facilityId, facilityName, pricePerHour, decommissionedUntilDate);		// Create Facility type object
+							facilities.add(newFacility);									// Add the Facility type object to the facilities arraylist
+						}
+						else
+						{
+							JOptionPane.showMessageDialog(null, "Error: invalid date format.", "Error", JOptionPane.ERROR_MESSAGE);
+						}
 					}
-					facilities.add(newFacility);									// Add the Facility type object to the facilities arraylist
 				}
 			}
 			in.close();																	// Close the facilities scanner

@@ -1,3 +1,5 @@
+import java.time.*;
+
 /**
  * Booking
  */
@@ -50,7 +52,7 @@ public class Booking
 		return userID;
 	}
 
-	public void setBookingDate(Date bookingDate)
+	public void setBookingDate(LocalDate bookingDate)
 	{
 		this.bookingDate = bookingDate;
 	}
