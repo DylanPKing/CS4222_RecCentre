@@ -182,6 +182,7 @@ public class RecCentre
 					if(lineFromFile.length == 3)									// Check the length of the array
 					{																			// If its 3, then it has no decommission
 						Facility newFacility = new Facility(facilityId, facilityName, pricePerHour);	// Create Facility type object
+						facilities.add(newFacility);
 					}
 					else																		// If its 4, then it is decommissioned and has an extra data field
 					{
