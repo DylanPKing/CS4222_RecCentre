@@ -7,14 +7,14 @@ public class BookingsAndAvailability
 	public static void main(String[] args)
 	{
 		int inputNum;
+		boolean isAdmin = false;
 		boolean quit = false;
 		while (!quit){
 			if (isAdmin) 
 			{
 				String[] adminOptions = {"Register a new user", "Add a new facility", "View Avaliblities", "View Bookings", 
 										 "Remove a facility", "Make a booking", "Record Payments", "View Accounts"};
-				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
-														JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
+				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
 				switch (inputNum)
 				{
 					case 0:
@@ -56,7 +56,7 @@ public class BookingsAndAvailability
 			}
 			else
 			{
-				String[] userOptions = {"View your Bookings", "View your statements"}
+				String[] userOptions = {"View your Bookings", "View your statements"};
 				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
 														JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
 				switch (inputNum)
