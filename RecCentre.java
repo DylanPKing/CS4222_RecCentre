@@ -317,9 +317,57 @@ public class RecCentre
 	
 	public static void adminViewBookings()
 	{
-		/* TODO:
-		 * - JTextArea of all of the Bookings ArrayList?
-		 */
+		String currentBookings = "";
+		for (int i = 0; i < bookings.size(); i++)
+		{
+			Booking thisBooking = bookings.get(i);
+			currentBookings += thisBooking.getFacilityID() + " is booked by " + thisBooking.getUserID() +
+							   " for " + thisBooking.getBookingDate().getDayOfMonth() + "/" +
+							   thisBooking.getBookingDate().getMonthValue() + "/" +
+							   thisBooking.getBookingDate().getYear() + " starting at ";
+			int slotNum = thisBooking.getSlotNumber();
+			switch (slotNum)
+			{
+				case 1:
+					
+					break;
+			
+				case 2:
+					
+					break;
+
+				case 3:
+					
+					break;
+
+				case 4:
+					
+					break;
+
+				case 5:
+					
+					break;
+
+				case 6:
+					
+					break;
+
+				case 7:
+					
+					break;
+
+				case 8:
+					
+					break;
+
+				case 9:
+					
+					break;
+				default:
+					break;
+			}
+			
+		}
 	}
 	
 	public static void userViewBookings()
