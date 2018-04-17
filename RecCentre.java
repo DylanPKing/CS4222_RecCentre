@@ -38,7 +38,7 @@ public class RecCentre
 							break;
 						
 						case 2: 
-							EditAndViewFacilities();
+							editAndViewFacilities();
 							break;
 						
 						case 3:
@@ -62,7 +62,7 @@ public class RecCentre
 					switch (inputNum)
 					{
 						case 0:
-							UserViewBookings();
+							userViewBookings();
 							break;
 						
 						case 1:
@@ -282,7 +282,7 @@ public class RecCentre
 		return paid;
 	}
 	
-	public static void EditAndViewFacilities()
+	public static void editAndViewFacilities()
 	{
 		String[] facilitiesNames = new String[facilities.size()];
 		for (int i = 0; i < facilities.size() - 1; i++)
@@ -291,7 +291,7 @@ public class RecCentre
 		}
 	}
 
-	public static void ViewFacilityAvailibilites()
+	public static void viewFacilityAvailibilites()
 	{
 		/* TODO:
 		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
@@ -302,7 +302,7 @@ public class RecCentre
 		 */ 
 	}
 	
-	public static void Makebooking()
+	public static void makebooking()
 	{
 		/* TODO:
 		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
@@ -315,14 +315,14 @@ public class RecCentre
 		 */
 	}
 	
-	public static void AdminViewBookings()
+	public static void adminViewBookings()
 	{
 		/* TODO:
 		 * - JTextArea of all of the Bookings ArrayList?
 		 */
 	}
 	
-	public static void UserViewBookings()
+	public static void userViewBookings()
 	{
 		/* TODO:
 		 * - Get the user ID (again global variable?)
