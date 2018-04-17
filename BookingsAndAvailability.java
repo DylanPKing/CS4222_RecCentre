@@ -1,141 +1,169 @@
+/**
+ * RecCentre
+ */
 import java.util.*;			// Scanner
 import javax.swing.*;		// JOptionPane   +   JTextArea
 import java.io.*;			// IOException  +  Files
 import java.time.LocalDate;
-
-
-//Should the Admin options have just a view/edit a facility option and then have in that have them chose a facility 
-//and then decide what to do specifically? 
-//Then there is no repeating of code to checkwhat facility the user wants to edit/view in every method
-
-
-public class BookingsAndAvailability
+public class RecCentre
 {
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
 	public static ArrayList<Facility> facilities = new ArrayList<Facility>();
 	public static ArrayList<User> users = new ArrayList<User>();
 	public static boolean isAdmin;
-	//public int loggedInID;
-
+	public static int loggedInUser;
 	public static void main(String[] args) throws IOException
 	{
 		fillArrayLists();
-
-		//loggedInID = 2;
-
-		int inputNum;
-		boolean isAdmin = false;
-		boolean quit = false;
-		while (!quit){
-			if (isAdmin) 
+		if(login())
+		{
+			int inputNum;
+			boolean quit = false;
+			while (!quit)
 			{
-				String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
-										 "Record Payments", "View Accounts"};
-				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-														JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
-				switch (inputNum)
+				if (isAdmin) 
 				{
-					case 0:
-						// Register new user method
-						break;
-					
-					case 1:
-						// Add new facility method
-						break;
-					
-					case 2: 
-						EditAndViewFacilities();
-						break;
-					
-					case 3:
-						// Record payments method
-						break;
+					String[] options = {"Register a new user", "Add a new facility", "Edit or View a facility",
+										"Remove a facility", "Record Payments", "View Accounts"};
+					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+					switch (inputNum)
+					{
+						case 0:
+							// Register new user method
+							break;
 						
-					case 4:
-						// View account statements
-						break;
-					
-					default:
-						quit = true;
-						break;
+						case 1:
+							// Add new facility method
+							break;
+						
+						case 2: 
+							EditAndViewFacilities();
+							break;
+
+						case 3:
+							//Remove a facility method
+						
+						case 4:
+							// Record payments method
+							break;
+							
+						case 5:
+							// View account statements
+							break;
+						
+						default:
+							quit = true;
+							break;
+					}
 				}
+				else
+				{
+					String[] options = {"View your Bookings", "View your statements"};
+					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
+															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+					switch (inputNum)
+					{
+						case 0:
+							UserViewBookings();
+							break;
+						
+						case 1:
+							// View statement
+							break;
+							
+						default:
+							quit = true;
+							break;
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * Takes in an email and password from the user, and checks it against
+	 * the existing user objects.
+	 * @return true if valid login
+	 */
+	public static boolean login()
+	{
+		String email, password;
+		int attempt;
+		boolean found = false;
+		String emailMsg = "Enter your email address:";
+		String passMsg = "Enter your password:";
+		for (attempt = 0; attempt < 3 && !found; attempt++)
+		{
+			email = JOptionPane.showInputDialog(null, emailMsg, "Enter userame",
+					JOptionPane.PLAIN_MESSAGE);
+			if (email != null)
+			{
+				password = JOptionPane.showInputDialog(null, passMsg, "Enter password",
+						JOptionPane.PLAIN_MESSAGE);
+				for (int i = 0; i < users.size() && !found; i++)
+				{
+					if (users.get(i).getEmail().equals(email) && users.get(i).getPassword().equals(password))
+					{
+						found = true;
+						isAdmin = users.get(i).getUserType() == 1;
+					}
+				}
+				if (!found)
+				{
+					emailMsg = "Invalid credentials. You have " + (3 - (attempt + 1)) +
+							" attempts remaining. Please enter email again:";
+					passMsg = "Please enter password again";
+				}
+			}
+		}
+		return found;
+	}
+
+	/**
+	 * Takes in a user chosen by the administrator, and generates
+	 * a random password between 8 and 50 characters, specified by
+	 * the administrator, and writes it to the Users object.
+	 * @param newUser
+	 */
+	public static void generatePassword(User newUser)
+	{
+		boolean validLength = false;
+		String strPassLength, diagText = "Please enter length of password:\n" +
+										 "Must be between 8 and 50 characters.";
+		int passLength;
+		while (!validLength)
+		{
+			strPassLength = JOptionPane.showInputDialog(null, diagText, "Enter length", JOptionPane.PLAIN_MESSAGE);
+			if (strPassLength.matches("[0-9]{8,50}"))
+			{
+				passLength = Integer.parseInt(strPassLength);
+				validLength = true;
+				String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
+				String password = "";
+				int poolChosen;
+				for (int i = 0; i < passLength; i++)
+				{
+					poolChosen = (int)(Math.random() * passwordPool.length);
+					password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+				}
+				newUser.setPassword(password);
 			}
 			else
 			{
-				String[] userOptions = {"View your Bookings", "View your statements"};
-				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
-														JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
-				switch (inputNum)
-				{
-					case 0:
-						UserViewBookings();
-						break;
-					
-					case 1:
-						// View statement
-						break;
-						
-					default:
-						quit = true;
-						break;
-				}
+				diagText = "Invalid input. Please enter a number between 8 and 50.";
 			}
 		}
 	}
-
-	public static void EditAndViewFacilities()
-	{
-		String[] facilitiesToEdit;
-		for (int i = 0; i < facilities.size() - 1; i++)
-		{
-			facilitiesToEdit[i] = facilities.getFacilityName();
-
-		}
-	}
-
-	public static void ViewFacilityAvailibilites()
-	{
-		/* TODO:
-		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
-		 * - Take in 2 inputs a start date and an end date to check(inclusive)
-		 * - Bubble sort the bookings ArrayList by date first?
-		 * - Go through by the dates(index 3) and check the slot(index 4) use Nested for loops
-		 * - If statements that if it isn't in the booking Array add it to a string and JTextArea?
-		 */ 
-	}
 	
-	public static void Makebooking()
-	{
-		/* TODO:
-		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
-		 * - Get the facility to make the booking for and check it exists and isnt decommissioned
-		 * - Get user ID (another global variable?)
-		 * - Get the date from the user
-		 * - Get the time from the user (List options available? or list all options and then check if it is available?)
-		 * - Ask the user if payment has been made(if it has add Y to ArrayList otherwise N)
-		 * - Display a message to say that the booking has been made
-		 */
-	}
-	
-	public static void AdminViewBookings()
-	{
-		/* TODO:
-		 * - JTextArea of all of the Bookings ArrayList?
-		 */
-	}
-	
-	public static void UserViewBookings()
-	{
-		/* TODO:
-		 * - Get the user ID (again global variable?)
-		 * - For Loop, read through the bookings ArrayList and check the userID for each one (index 2)
-		 * - If it equals the userID logged in add it to a string and use JTextArea?
-		 */
-	}
-
-
-//SZYMON'S CODE FOR TESTING
-
+	/**
+	  * fillArrayLists() is a method that is executed at the launch of the program
+	  * It has no passed in parameters
+	  * It doesn't return any values
+	  * It fills our arraylists with the data from the text files
+	  * Saves having to read from the text files multiple times
+	  * Calls the constructor methods for Booking, User and Facility
+	  * Calls checkIfPaid() to check if the booking is paid for
+	  */
 	public static void fillArrayLists() throws IOException			// Since we have files we need to throw those exceptions away
 	{
 		File input1 = new File("Bookings.txt");								// A file for bookings
@@ -181,7 +209,7 @@ public class BookingsAndAvailability
 								  // COnverts the date array into an actual date
 					slotNumber = Integer.parseInt(lineFromFile[4]);
 					test = lineFromFile[5];
-					//paymentStatus = checkIfPaid(test);						// Need a method for this boolean
+					paymentStatus = checkIfPaid(test);						// Need a method for this boolean
 					Booking reservation = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paymentStatus);		// Create a Booking object with the variables
 					bookings.add(reservation);									// Add the Booking to the arraylist of Bookings
 				}
@@ -239,5 +267,93 @@ public class BookingsAndAvailability
 		{
 			JOptionPane.showMessageDialog(null, "One or more files don't exist", "Error", 2);		// Get this error mate
 		}
+	}
+	
+	/**
+	  * checkIfPaid() checks the bookings to see if it was paid
+	  * It is called from the fillArrayLists() method to help create a boolean
+	  * It is passed a String as a parameter
+	  * It returns a boolean
+	  */
+	public static boolean checkIfPaid(String test)
+	{
+		boolean paid = false;
+		if(test.equals("true"))
+		{
+			paid = true;
+		}
+		return paid;
+	}
+	
+	public static void editAndViewFacilities()
+	{
+		String[] facilitiesNames = new String[facilities.size()];
+		String facilityToEdit;
+		for (int i = 0; i < facilities.size() - 1; i++)
+		{
+			facilitiesNames[i] = facilities.get(i).getFacilityName();
+		}
+		facilityToEdit = JOptionPane.showInputDialog(null,"What facility would you like to edit/view?", "Choose a facility", 1,
+													 null, facilitiesNames, facilitiesNames[0]);
+		String[] options = {"View facility availability", "Make a booking", "View Bookings"}
+		int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+													JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+		switch(inputNum)
+		{
+			case 0:
+				viewFacilityAvailibilites(facilityToEdit);
+				break;
+			
+			case 1:
+				makeBooking(facilityToEdit);
+				break;
+
+			case 2:
+				adminViewBookings(facilityToEdit);
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	public static void viewFacilityAvailibilites(String facilityToEdit)
+	{
+		/* TODO:
+		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
+		 * - Take in 2 inputs a start date and an end date to check(inclusive)
+		 * - Bubble sort the bookings ArrayList by date first?
+		 * - Go through by the dates(index 3) and check the slot(index 4) use Nested for loops
+		 * - If statements that if it isn't in the booking Array add it to a string and JTextArea?
+		 */ 
+	}
+	
+	public static void makeBooking(String facilityToEdit)
+	{
+		/* TODO:
+		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
+		 * - Get the facility to make the booking for and check it exists and isnt decommissioned
+		 * - Get user ID (another global variable?)
+		 * - Get the date from the user
+		 * - Get the time from the user (List options available? or list all options and then check if it is available?)
+		 * - Ask the user if payment has been made(if it has add Y to ArrayList otherwise N)
+		 * - Display a message to say that the booking has been made
+		 */
+	}
+	
+	public static void adminViewBookings()
+	{
+		/* TODO:
+		 * - JTextArea of all of the Bookings ArrayList?
+		 */
+	}
+	
+	public static void userViewBookings()
+	{
+		/* TODO:
+		 * - Get the user ID (again global variable?)
+		 * - For Loop, read through the bookings ArrayList and check the userID for each one (index 2)
+		 * - If it equals the userID logged in add it to a string and use JTextArea?
+		 */
 	}
 }

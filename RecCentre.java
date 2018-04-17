@@ -19,14 +19,15 @@ public class RecCentre
 		{
 			int inputNum;
 			boolean quit = false;
+			String[] options;
 			while (!quit)
 			{
 				if (isAdmin) 
 				{
-					String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
-											"Record Payments", "View Accounts"};
+					options = {"Register a new user", "Add a new facility", "Edit or View a facility", 
+											 "Remove a facility", "Record Payments", "View Accounts"};
 					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-															JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
+															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
 					switch (inputNum)
 					{
 						case 0:
@@ -46,6 +47,10 @@ public class RecCentre
 							break;
 							
 						case 4:
+							//Remove a facility
+							break;
+
+						case 5:
 							// View account statements
 							break;
 						
@@ -56,9 +61,9 @@ public class RecCentre
 				}
 				else
 				{
-					String[] userOptions = {"View your Bookings", "View your statements"};
+					String[] options = {"View your Bookings", "View your statements"};
 					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
-															JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
+															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
 					switch (inputNum)
 					{
 						case 0:
@@ -285,13 +290,40 @@ public class RecCentre
 	public static void editAndViewFacilities()
 	{
 		String[] facilitiesNames = new String[facilities.size()];
+		String facilityToEdit;
 		for (int i = 0; i < facilities.size() - 1; i++)
 		{
 			facilitiesNames[i] = facilities.get(i).getFacilityName();
 		}
+		facilityToEdit = JOptionPane.showInputDialog(null,"What facility would you like to edit/view?", "Choose a facility", 1,
+													 null, facilitiesNames, facilitiesNames[0]);
+		String[] options = {"View facility availability", "Make a booking", "View Bookings", "Decommission a facility"}
+		int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+													JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+		switch(inputNum)
+		{
+			case 0:
+				viewFacilityAvailibilites(facilityToEdit);
+				break;
+			
+			case 1:
+				makeBooking(facilityToEdit);
+				break;
+
+			case 2:
+				adminViewBookings(facilityToEdit);
+				break;
+
+			case 3:
+				//Decommission a facility method
+				break;
+
+			default:
+				break;
+		}
 	}
 
-	public static void viewFacilityAvailibilites()
+	public static void viewFacilityAvailibilites(String facilityToEdit)
 	{
 		/* TODO:
 		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
@@ -302,7 +334,7 @@ public class RecCentre
 		 */ 
 	}
 	
-	public static void makebooking()
+	public static void makebooking(String facilityToEdit)
 	{
 		/* TODO:
 		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
