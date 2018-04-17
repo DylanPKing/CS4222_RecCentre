@@ -284,11 +284,10 @@ public class RecCentre
 	
 	public static void EditAndViewFacilities()
 	{
-		String[] facilitiesToEdit;
+		String[] facilitiesNames = new String[facilities.size()];
 		for (int i = 0; i < facilities.size() - 1; i++)
 		{
-			facilitiesToEdit[i] = facilities.get(i);
-
+			facilitiesNames[i] = facilities.get(i).getFacilityName();
 		}
 	}
 
