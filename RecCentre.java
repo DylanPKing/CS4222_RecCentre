@@ -11,71 +11,72 @@ public class RecCentre
 	public static ArrayList<Facility> facilities = new ArrayList<Facility>();
 	public static ArrayList<User> users = new ArrayList<User>();
 	public static boolean isAdmin;
+	public static int loggedInUser;
 	public static void main(String[] args) throws IOException
 	{
 		fillArrayLists();
 		if(login())
 		{
 			int inputNum;
-			boolean isAdmin = false;
 			boolean quit = false;
-			while (!quit){
-			if (isAdmin) 
+			while (!quit)
 			{
-				String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
-										 "Record Payments", "View Accounts"};
-				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-														JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
-				switch (inputNum)
+				if (isAdmin) 
 				{
-					case 0:
-						// Register new user method
-						break;
-					
-					case 1:
-						// Add new facility method
-						break;
-					
-					case 2: 
-						EditAndViewFacilities();
-						break;
-					
-					case 3:
-						// Record payments method
-						break;
+					String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
+											"Record Payments", "View Accounts"};
+					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+															JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
+					switch (inputNum)
+					{
+						case 0:
+							// Register new user method
+							break;
 						
-					case 4:
-						// View account statements
-						break;
-					
-					default:
-						quit = true;
-						break;
+						case 1:
+							// Add new facility method
+							break;
+						
+						case 2: 
+							EditAndViewFacilities();
+							break;
+						
+						case 3:
+							// Record payments method
+							break;
+							
+						case 4:
+							// View account statements
+							break;
+						
+						default:
+							quit = true;
+							break;
+					}
 				}
-			}
-			else
-			{
-				String[] userOptions = {"View your Bookings", "View your statements"};
-				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
-														JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
-				switch (inputNum)
+				else
 				{
-					case 0:
-						UserViewBookings();
-						break;
-					
-					case 1:
-						// View statement
-						break;
+					String[] userOptions = {"View your Bookings", "View your statements"};
+					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
+															JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
+					switch (inputNum)
+					{
+						case 0:
+							UserViewBookings();
+							break;
 						
-					default:
-						quit = true;
-						break;
+						case 1:
+							// View statement
+							break;
+							
+						default:
+							quit = true;
+							break;
+					}
 				}
 			}
 		}
 	}
-
 	/**
 	 * Takes in an email and password from the user, and checks it against
 	 * the existing user objects.
@@ -286,7 +287,7 @@ public class RecCentre
 		String[] facilitiesToEdit;
 		for (int i = 0; i < facilities.size() - 1; i++)
 		{
-			facilitiesToEdit[i] = facilities.getFacilityName();
+			facilitiesToEdit[i] = facilities.get(i);
 
 		}
 	}
