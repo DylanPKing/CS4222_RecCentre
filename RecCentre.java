@@ -16,7 +16,63 @@ public class RecCentre
 		fillArrayLists();
 		if(login())
 		{
-			
+			int inputNum;
+			boolean isAdmin = false;
+			boolean quit = false;
+			while (!quit){
+			if (isAdmin) 
+			{
+				String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
+										 "Record Payments", "View Accounts"};
+				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+														JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
+				switch (inputNum)
+				{
+					case 0:
+						// Register new user method
+						break;
+					
+					case 1:
+						// Add new facility method
+						break;
+					
+					case 2: 
+						EditAndViewFacilities();
+						break;
+					
+					case 3:
+						// Record payments method
+						break;
+						
+					case 4:
+						// View account statements
+						break;
+					
+					default:
+						quit = true;
+						break;
+				}
+			}
+			else
+			{
+				String[] userOptions = {"View your Bookings", "View your statements"};
+				inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
+														JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
+				switch (inputNum)
+				{
+					case 0:
+						UserViewBookings();
+						break;
+					
+					case 1:
+						// View statement
+						break;
+						
+					default:
+						quit = true;
+						break;
+				}
+			}
 		}
 	}
 
@@ -225,5 +281,53 @@ public class RecCentre
 		return paid;
 	}
 	
+	public static void EditAndViewFacilities()
+	{
+		String[] facilitiesToEdit;
+		for (int i = 0; i < facilities.size() - 1; i++)
+		{
+			facilitiesToEdit[i] = facilities.getFacilityName();
+
+		}
+	}
+
+	public static void ViewFacilityAvailibilites()
+	{
+		/* TODO:
+		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
+		 * - Take in 2 inputs a start date and an end date to check(inclusive)
+		 * - Bubble sort the bookings ArrayList by date first?
+		 * - Go through by the dates(index 3) and check the slot(index 4) use Nested for loops
+		 * - If statements that if it isn't in the booking Array add it to a string and JTextArea?
+		 */ 
+	}
 	
+	public static void Makebooking()
+	{
+		/* TODO:
+		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
+		 * - Get the facility to make the booking for and check it exists and isnt decommissioned
+		 * - Get user ID (another global variable?)
+		 * - Get the date from the user
+		 * - Get the time from the user (List options available? or list all options and then check if it is available?)
+		 * - Ask the user if payment has been made(if it has add Y to ArrayList otherwise N)
+		 * - Display a message to say that the booking has been made
+		 */
+	}
+	
+	public static void AdminViewBookings()
+	{
+		/* TODO:
+		 * - JTextArea of all of the Bookings ArrayList?
+		 */
+	}
+	
+	public static void UserViewBookings()
+	{
+		/* TODO:
+		 * - Get the user ID (again global variable?)
+		 * - For Loop, read through the bookings ArrayList and check the userID for each one (index 2)
+		 * - If it equals the userID logged in add it to a string and use JTextArea?
+		 */
+	}
 }
