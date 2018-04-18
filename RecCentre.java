@@ -290,27 +290,37 @@ public class RecCentre
 	{
 		String[] facilitiesNames = new String[facilities.size()];
 		String facilityToEdit;
-		for (int i = 0; i < facilities.size() - 1; i++)
+		boolean idFound = false;
+		int idToEdit;
+		for (int i = 0; i < facilities.size(); i++)
 		{
 			facilitiesNames[i] = facilities.get(i).getFacilityName();
 		}
 		facilityToEdit = JOptionPane.showInputDialog(null,"What facility would you like to edit/view?", "Choose a facility", 1,
 													 null, facilitiesNames, facilitiesNames[0]);
+		for (int i; i < facilities.size() && !idFound; i++)
+		{
+			if (facilities.get(i).getFacilityName().equals(facilityToEdit))
+			{
+				idToEdit = facilities.get(i).getFacilityID();
+				idFound = true;
+			}
+		}
 		String[] options = {"View facility availability", "Make a booking", "View Bookings"}
 		int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
 													JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
 		switch(inputNum)
 		{
 			case 0:
-				viewFacilityAvailibilites(facilityToEdit);
+				viewFacilityAvailibilites(idToEdit);
 				break;
 			
 			case 1:
-				makeBooking(facilityToEdit);
+				makeBooking(idToEdit);
 				break;
 
 			case 2:
-				adminViewBookings(facilityToEdit);
+				adminViewBookings(idToEdit);
 				break;
 
 			default:
@@ -318,7 +328,7 @@ public class RecCentre
 		}
 	}
 
-	public static void viewFacilityAvailibilites(String facilityToEdit)
+	public static void viewFacilityAvailibilites(int idToEdit)
 	{
 		/* TODO:
 		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
@@ -329,7 +339,7 @@ public class RecCentre
 		 */ 
 	}
 	
-	public static void makebooking(String facilityToEdit)
+	public static void makebooking(int idToEdit)
 	{
 		/* TODO:
 		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
@@ -342,12 +352,12 @@ public class RecCentre
 		 */
 	}
 	
-	public static void adminViewBookings(String facilityToEdit)
+	public static void adminViewBookings(int idToEdit)
 	{
 		
 	}
 	
-	public static void userViewBookings(String facilityToEdits)
+	public static void userViewBookings(int idToEdit)
 	{
 		/* TODO:
 		 * - Get the user ID (again global variable?)
