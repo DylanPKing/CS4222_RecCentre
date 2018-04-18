@@ -1,10 +1,11 @@
-/**
- * RecCentre
- */
 import java.util.*;			// Scanner
 import javax.swing.*;		// JOptionPane   +   JTextArea
 import java.io.*;			// IOException  +  Files
-import java.time.LocalDate;
+import java.time.*;
+
+/**
+ * RecCentre
+ */
 public class RecCentre
 {
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
@@ -66,7 +67,7 @@ public class RecCentre
 					switch (inputNum)
 					{
 						case 0:
-							userViewBookings();
+							// userViewBookings();
 							break;
 						
 						case 1:
@@ -291,41 +292,50 @@ public class RecCentre
 		String[] facilitiesNames = new String[facilities.size()];
 		String facilityToEdit;
 		boolean idFound = false;
-		int idToEdit;
-		for (int i = 0; i < facilities.size(); i++)
+		int idToEdit = 0;
+		try
 		{
-			facilitiesNames[i] = facilities.get(i).getFacilityName();
-		}
-		facilityToEdit = JOptionPane.showInputDialog(null,"What facility would you like to edit/view?", "Choose a facility", 1,
-													 null, facilitiesNames, facilitiesNames[0]);
-		for (int i; i < facilities.size() && !idFound; i++)
-		{
-			if (facilities.get(i).getFacilityName().equals(facilityToEdit))
+			for (int i = 0; i < facilities.size(); i++)
 			{
-				idToEdit = facilities.get(i).getFacilityID();
-				idFound = true;
+				facilitiesNames[i] = facilities.get(i).getFacilityName();
+			}
+			facilityToEdit = (String)(JOptionPane.showInputDialog(null, "What facility would you like to edit/view?",
+							"Choose a facility", 1, null, facilitiesNames, facilitiesNames[0]));
+			for (int i = 0; i < facilities.size() && !idFound; i++)
+			{
+				if (facilities.get(i).getFacilityName().equals(facilityToEdit))
+				{
+					idToEdit = facilities.get(i).getFacilityID();
+					idFound = true;
+				}
+			}
+			String[] options = {"View facility availability", "Make a booking", "View Bookings"};
+			int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+														JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+			switch(inputNum)
+			{
+				case 0:
+					viewFacilityAvailibilites(idToEdit);
+					break;
+				
+				case 1:
+					// makeBooking(idToEdit);
+					break;
+
+				case 2:
+					adminViewBookings(idToEdit);
+					break;
+
+				default:
+					break;
 			}
 		}
-		String[] options = {"View facility availability", "Make a booking", "View Bookings"}
-		int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-													JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
-		switch(inputNum)
+		catch (ArrayIndexOutOfBoundsException e)
 		{
-			case 0:
-				viewFacilityAvailibilites(idToEdit);
-				break;
-			
-			case 1:
-				makeBooking(idToEdit);
-				break;
-
-			case 2:
-				adminViewBookings(idToEdit);
-				break;
-
-			default:
-				break;
+			//TODO: handle exception. Change to If statement
+			JOptionPane.showMessageDialog(null, "Error: No facilities registered. Please create a new facility before attempmting to view or edit.", "Error", JOptionPane.ERROR_MESSAGE);
 		}
+			
 	}
 
 	public static void viewFacilityAvailibilites(int idToEdit)
@@ -352,9 +362,53 @@ public class RecCentre
 		 */
 	}
 	
-	public static void adminViewBookings(int idToEdit)
+	public static void adminViewBookings(int idToView)
 	{
-		
+		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
+		int facilityID;
+		LocalDate bookingDate, dateToView;
+		String[] dateElements;
+		String dateString = JOptionPane.showInputDialog(null, "Please enter the date you would like to view in the format dd/mm/yyyy", "Enter date");
+		String output = "";
+		if (dateString.matches("[0-9]{2}/[0-9]{{1,2}/[0-9]{4}"))
+		{
+			dateElements = dateString.split("/");
+			dateToView = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]),
+									  Integer.parseInt(dateElements[0]));
+			for (int i = 0; i < bookings.size(); i++)
+			{
+				facilityID = bookings.get(i).getFacilityID();
+				bookingDate = bookings.get(i).getBookingDate();
+				if (facilityID == idToView && bookingDate.isEqual(dateToView))
+				{
+					bookingsToView.add(bookings.get(i));
+				}
+			}
+			if (bookingsToView.size() != 0)
+			{
+				String paid;
+				output += "These bookings are scheduled in this facility today:\n";
+				for (int i = 0; i < bookingsToView.size(); i++)
+				{
+					paid = "has not been paid";
+					if (bookingsToView.get(i).getPaymentStatus())
+					{
+						paid = "has been paid";
+					}
+					output += "User" + bookingsToView.get(i).getUserID() + " has a booking at " +
+							  (bookingsToView.get(i).getSlotNumber() + 8) + " and " + paid + "\n";
+				}
+			}
+			else
+			{
+				output += "No booking scheduled on the day entered.";
+			}
+		}
+		else
+		{
+			output += "Error: Invalid date format.";
+		}
+		JOptionPane.showMessageDialog(null, output, "Result", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public static void userViewBookings(int idToEdit)
