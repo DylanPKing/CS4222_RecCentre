@@ -1,10 +1,11 @@
-/**
- * RecCentre
- */
 import java.util.*;			// Scanner
 import javax.swing.*;		// JOptionPane   +   JTextArea
 import java.io.*;			// IOException  +  Files
-import java.time.LocalDate;
+import java.time.*;
+
+/**
+ * RecCentre
+ */
 public class RecCentre
 {
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
@@ -66,7 +67,7 @@ public class RecCentre
 					switch (inputNum)
 					{
 						case 0:
-							userViewBookings();
+							// userViewBookings();
 							break;
 						
 						case 1:
@@ -290,35 +291,54 @@ public class RecCentre
 	{
 		String[] facilitiesNames = new String[facilities.size()];
 		String facilityToEdit;
-		for (int i = 0; i < facilities.size() - 1; i++)
+		boolean idFound = false;
+		int idToEdit = 0;
+		try
 		{
-			facilitiesNames[i] = facilities.get(i).getFacilityName();
+			for (int i = 0; i < facilities.size(); i++)
+			{
+				facilitiesNames[i] = facilities.get(i).getFacilityName();
+			}
+			facilityToEdit = (String)(JOptionPane.showInputDialog(null, "What facility would you like to edit/view?",
+							"Choose a facility", 1, null, facilitiesNames, facilitiesNames[0]));
+			for (int i = 0; i < facilities.size() && !idFound; i++)
+			{
+				if (facilities.get(i).getFacilityName().equals(facilityToEdit))
+				{
+					idToEdit = facilities.get(i).getFacilityID();
+					idFound = true;
+				}
+			}
+			String[] options = {"View facility availability", "Make a booking", "View Bookings"};
+			int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+														JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+			switch(inputNum)
+			{
+				case 0:
+					viewFacilityAvailibilites(idToEdit);
+					break;
+				
+				case 1:
+					// makeBooking(idToEdit);
+					break;
+
+				case 2:
+					adminViewBookings(idToEdit);
+					break;
+
+				default:
+					break;
+			}
 		}
-		facilityToEdit = JOptionPane.showInputDialog(null,"What facility would you like to edit/view?", "Choose a facility", 1,
-													 null, facilitiesNames, facilitiesNames[0]);
-		String[] options = {"View facility availability", "Make a booking", "View Bookings"}
-		int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-													JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
-		switch(inputNum)
+		catch (ArrayIndexOutOfBoundsException e)
 		{
-			case 0:
-				viewFacilityAvailibilites(facilityToEdit);
-				break;
+			//TODO: handle exception. Change to If statement
+			JOptionPane.showMessageDialog(null, "Error: No facilities registered. Please create a new facility before attempmting to view or edit.", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 			
-			case 1:
-				makeBooking(facilityToEdit);
-				break;
-
-			case 2:
-				adminViewBookings(facilityToEdit);
-				break;
-
-			default:
-				break;
-		}
 	}
 
-	public static void viewFacilityAvailibilites(String facilityToEdit)
+	public static void viewFacilityAvailibilites(int idToEdit)
 	{
 		/* TODO:
 		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
@@ -327,25 +347,9 @@ public class RecCentre
 		 * - Go through by the dates(index 3) and check the slot(index 4) use Nested for loops
 		 * - If statements that if it isn't in the booking Array add it to a string and JTextArea?
 		 */ 
-		 String startDate, endDate;
-		 startDate = JOptionPane.showInputDialog(null, "Check availabilities from what date? /n(dd/mm/yyyy)");
-		 endDate = JOptionPane.showInputDialog(null, "Until what date? /n(dd/mm/yyyy)");
-		 String[] startArray = startDate.split("/");
-		 String[] endArray = endDate.split("/");
-		 LocalDate localStartDate = LocalDate.of(startArray[2], startArray[1], startArray[0]);
-		 LocalDate localEndDate = LocalDate.of(endArray[2], endArray[1], endArray[0]);
-		 for (int i = startArray[0], j = startArray[1]; i < endArray[0] && j < endArray[1]; i++)
-		 {
-			 if (i == 31)
-			 {
-				 j++;
-			 }
-			 LocalDate testDate = LocalDate.of(startArray[2], j, i);
-			 
-		 }
 	}
 	
-	public static void makebooking(String facilityToEdit)
+	public static void makebooking(int idToEdit)
 	{
 		/* TODO:
 		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
@@ -358,12 +362,56 @@ public class RecCentre
 		 */
 	}
 	
-	public static void adminViewBookings(String facilityToEdit)
+	public static void adminViewBookings(int idToView)
 	{
-		
+		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
+		int facilityID;
+		LocalDate bookingDate, dateToView;
+		String[] dateElements;
+		String dateString = JOptionPane.showInputDialog(null, "Please enter the date you would like to view in the format dd/mm/yyyy", "Enter date");
+		String output = "";
+		if (dateString.matches("[0-9]{2}/[0-9]{{1,2}/[0-9]{4}"))
+		{
+			dateElements = dateString.split("/");
+			dateToView = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]),
+									  Integer.parseInt(dateElements[0]));
+			for (int i = 0; i < bookings.size(); i++)
+			{
+				facilityID = bookings.get(i).getFacilityID();
+				bookingDate = bookings.get(i).getBookingDate();
+				if (facilityID == idToView && bookingDate.isEqual(dateToView))
+				{
+					bookingsToView.add(bookings.get(i));
+				}
+			}
+			if (bookingsToView.size() != 0)
+			{
+				String paid;
+				output += "These bookings are scheduled in this facility today:\n";
+				for (int i = 0; i < bookingsToView.size(); i++)
+				{
+					paid = "has not been paid";
+					if (bookingsToView.get(i).getPaymentStatus())
+					{
+						paid = "has been paid";
+					}
+					output += "User" + bookingsToView.get(i).getUserID() + " has a booking at " +
+							  (bookingsToView.get(i).getSlotNumber() + 8) + " and " + paid + "\n";
+				}
+			}
+			else
+			{
+				output += "No booking scheduled on the day entered.";
+			}
+		}
+		else
+		{
+			output += "Error: Invalid date format.";
+		}
+		JOptionPane.showMessageDialog(null, output, "Result", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
-	public static void userViewBookings(String facilityToEdit)
+	public static void userViewBookings(int idToEdit)
 	{
 		/* TODO:
 		 * - Get the user ID (again global variable?)
