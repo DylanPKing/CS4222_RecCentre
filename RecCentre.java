@@ -352,16 +352,25 @@ public class RecCentre
 		 endDate = JOptionPane.showInputDialog(null, "Until what date? /n(dd/mm/yyyy)");
 		 String[] startArray = startDate.split("/");
 		 String[] endArray = endDate.split("/");
-		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]);
+		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]));
 		 LocalDate localEndDate = LocalDate.of(Integer.parseInt(endArray[2]), Integer.parseInt(endArray[1]), Integer.parseInt(endArray[0]));
-		 for (int i = startArray[0], j = startArray[1]; i < endArray[0] && j < endArray[1]; i++)
+		 LocalDate testDate;
+		 for (testDate = localStartDate; testDate.isBefore(localEndDate) || testDate.equals(localEndDate); testDate.plusDays(1))
 		 {
-			 if (i == 31)
-			 {
-				 j++;
-			 }
-			 LocalDate testDate = LocalDate.of(startArray[2], j, i);
-			 
+			String output;
+			for (int i = 0; i < bookings.size(); i++)
+			{
+				if (bookings.get(i).getBookingDate().equals(testDate))
+				{
+					for (int j = 1; j < 10; j++)
+					{
+						if (bookings.get(i).getSlotNumber() != j)
+						{
+							output = bookings.get(i) + "/n";
+						}
+					}
+				}
+			}
 		 }
 	}
 	
