@@ -13,6 +13,7 @@ public class DylanFile
 	public static ArrayList<User> users = new ArrayList<User>();
 	public static boolean isAdmin;
 	public static int loggedInUser;
+	public static User currentUser;
 	public static void main(String[] args) throws IOException
 	{
 		fillArrayLists();
@@ -67,7 +68,7 @@ public class DylanFile
 					switch (inputNum)
 					{
 						case 0:
-							// userViewBookings();
+							viewBookings(idToView);
 							break;
 						
 						case 1:
@@ -108,6 +109,8 @@ public class DylanFile
 					{
 						found = true;
 						isAdmin = users.get(i).getUserType() == 1;
+						loggedInUser = users.get(i).getUserID();
+						currentUser = users.get(i);
 					}
 				}
 				if (!found)
@@ -323,7 +326,7 @@ public class DylanFile
 					break;
 
 				case 2:
-					adminViewBookings(idToEdit);
+					viewBookings(idToEdit);
 					break;
 
 				default:
@@ -352,15 +355,15 @@ public class DylanFile
 		 endDate = JOptionPane.showInputDialog(null, "Until what date? /n(dd/mm/yyyy)");
 		 String[] startArray = startDate.split("/");
 		 String[] endArray = endDate.split("/");
-		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]);
+		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]));
 		 LocalDate localEndDate = LocalDate.of(Integer.parseInt(endArray[2]), Integer.parseInt(endArray[1]), Integer.parseInt(endArray[0]));
-		 for (int i = startArray[0], j = startArray[1]; i < endArray[0] && j < endArray[1]; i++)
+		 for (int i = Integer.parseInt(startArray[0]), j = Integer.parseInt(startArray[1]); i < Integer.parseInt(endArray[0]) && j < Integer.parseInt(endArray[1]); i++)
 		 {
 			 if (i == 31)
 			 {
 				 j++;
 			 }
-			 LocalDate testDate = LocalDate.of(startArray[2], j, i);
+			 LocalDate testDate = LocalDate.of(Integer.parseInt(startArray[2]), j, i);
 			 
 		 }
 	}
@@ -378,7 +381,7 @@ public class DylanFile
 		 */
 	}
 	
-	public static void adminViewBookings(int idToView)
+	public static void viewBookings(int idToView)
 	{
 		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
 		int facilityID;
@@ -391,13 +394,31 @@ public class DylanFile
 			dateElements = dateString.split("/");
 			dateToView = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]),
 									  Integer.parseInt(dateElements[0]));
-			for (int i = 0; i < bookings.size(); i++)
+
+			if (isAdmin)
 			{
-				facilityID = bookings.get(i).getFacilityID();
-				bookingDate = bookings.get(i).getBookingDate();
-				if (facilityID == idToView && bookingDate.isEqual(dateToView))
+				for (int i = 0; i < bookings.size(); i++)
 				{
-					bookingsToView.add(bookings.get(i));
+					facilityID = bookings.get(i).getFacilityID();
+					bookingDate = bookings.get(i).getBookingDate();
+					if (facilityID == idToView && bookingDate.isEqual(dateToView))
+					{
+						bookingsToView.add(bookings.get(i));
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < bookings.size(); i++)
+				{
+					facilityID = bookings.get(i).getFacilityID();
+					bookingDate = bookings.get(i).getBookingDate();
+					bookingUser = bookings.get(i).getUserID();
+					if (facilityID == idToView && bookingDate.isEqual(dateToView) &&
+						bookingUser == currentUser.getUserID())
+					{
+						bookingsToView.add(bookings.get(i));
+					}
 				}
 			}
 			if (bookingsToView.size() != 0)
@@ -425,14 +446,5 @@ public class DylanFile
 			output += "Error: Invalid date format.";
 		}
 		JOptionPane.showMessageDialog(null, output, "Result", JOptionPane.INFORMATION_MESSAGE);
-	}
-	
-	public static void userViewBookings(int idToEdit)
-	{
-		/* TODO:
-		 * - Get the user ID (again global variable?)
-		 * - For Loop, read through the bookings ArrayList and check the userID for each one (index 2)
-		 * - If it equals the userID logged in add it to a string and use JTextArea?
-		 */
 	}
 }

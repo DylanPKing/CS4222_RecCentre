@@ -391,13 +391,31 @@ public class RecCentre
 			dateElements = dateString.split("/");
 			dateToView = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]),
 									  Integer.parseInt(dateElements[0]));
-			for (int i = 0; i < bookings.size(); i++)
+
+			if (isAdmin)
 			{
-				facilityID = bookings.get(i).getFacilityID();
-				bookingDate = bookings.get(i).getBookingDate();
-				if (facilityID == idToView && bookingDate.isEqual(dateToView))
+				for (int i = 0; i < bookings.size(); i++)
 				{
-					bookingsToView.add(bookings.get(i));
+					facilityID = bookings.get(i).getFacilityID();
+					bookingDate = bookings.get(i).getBookingDate();
+					if (facilityID == idToView && bookingDate.isEqual(dateToView))
+					{
+						bookingsToView.add(bookings.get(i));
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < bookings.size(); i++)
+				{
+					facilityID = bookings.get(i).getFacilityID();
+					bookingDate = bookings.get(i).getBookingDate();
+					bookingUser = bookings.get(i).getUserID();
+					if (facilityID == idToView && bookingDate.isEqual(dateToView) &&
+						bookingUser == currentUser.getUserID())
+					{
+						bookingsToView.add(bookings.get(i));
+					}
 				}
 			}
 			if (bookingsToView.size() != 0)
@@ -425,14 +443,5 @@ public class RecCentre
 			output += "Error: Invalid date format.";
 		}
 		JOptionPane.showMessageDialog(null, output, "Result", JOptionPane.INFORMATION_MESSAGE);
-	}
-	
-	public static void userViewBookings(int idToEdit)
-	{
-		/* TODO:
-		 * - Get the user ID (again global variable?)
-		 * - For Loop, read through the bookings ArrayList and check the userID for each one (index 2)
-		 * - If it equals the userID logged in add it to a string and use JTextArea?
-		 */
 	}
 }
