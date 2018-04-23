@@ -453,4 +453,63 @@ public class RecCentre
 		}
 		JOptionPane.showMessageDialog(null, output, "Result", JOptionPane.INFORMATION_MESSAGE);
 	}
+	
+	/**
+		  *	viewAccountStatement() can be called from the main
+		  * It reads the arraylists and checks the payment status of a user.
+		  * It can be accessed by both the admin and the user
+		  * If accessed by the admin, it displays all the facilities and the outstanding balances
+		  * If accessed by a user, it displays  all the outstanding balances for that user
+		  */
+		public static void viewAccountStatement()
+		{
+			String statement = "";																						// My vars
+			String pay = "";
+			if(isAdmin)																										// If admin is logged on
+			{
+				for(int i = 0; i < bookings.size(); i++)															// Run through bookings
+				{
+					if(bookings.get(i).getPaymentStatus())														// If paid
+					{
+						pay = "has been paid";
+					}
+					else																											// If not paid
+					{
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID().matches(bookings.get(i).getFacilityID))											// Find the facility for that booking
+							{
+								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();						// Attach its price to pay
+							}
+						}
+					}
+					statement += bookings.get(i).getFacilityName() + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";	// Ammend the whole thing onto statement
+				}
+			}
+			else																													// Is not admin
+			{
+				for(int i = 0; i < bookings.size(); i++)															// Run through bookings
+				{
+					if(bookings.get(i).getPaymentStatus())														// If paid
+					{
+						pay = "has been paid";
+					}
+					else																											// If not paid
+					{
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID().matches(bookings.get(i).getFacilityID))										// Get facility for that booking
+							{
+								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();					// Put price in pay
+							}
+						}
+					}
+					if(bookings.getUserID.matches(loggedInUser))																						// If used a user with matching id
+					{
+						statement += bookings.get(i).getFacilityName() + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";			// Amend the relevant booking to statement
+					}
+				}
+			}
+			JOptionPane.showMessageDialog(null, statement);											// Show the bookings
+		}
 }
