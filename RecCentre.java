@@ -387,7 +387,7 @@ public class RecCentre
 		 */
 	}
 	
-	public static void adminViewBookings(int idToView)
+	public static void ViewBookings(int idToView)
 	{
 		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
 		int facilityID;
@@ -465,25 +465,34 @@ public class RecCentre
 		{
 			String statement = "";																						// My vars
 			String pay = "";
+			String facilityCheck = "";
 			if(isAdmin)																										// If admin is logged on
 			{
 				for(int i = 0; i < bookings.size(); i++)															// Run through bookings
 				{
 					if(bookings.get(i).getPaymentStatus())														// If paid
 					{
-						pay = "has been paid";
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
+							{
+								pay = "has been paid";								// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
+							}
+						}
 					}
 					else																											// If not paid
 					{
 						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
 						{
-							if(facilities.get(j).getFacilityID().matches(bookings.get(i).getFacilityID))											// Find the facility for that booking
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())										// Find the facility for that booking
 							{
-								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();						// Attach its price to pay
+								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
 							}
 						}
 					}
-					statement += bookings.get(i).getFacilityName() + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";	// Ammend the whole thing onto statement
+					statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";	// Ammend the whole thing onto statement
 				}
 			}
 			else																													// Is not admin
@@ -492,21 +501,29 @@ public class RecCentre
 				{
 					if(bookings.get(i).getPaymentStatus())														// If paid
 					{
-						pay = "has been paid";
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
+							{
+								pay = "has been paid";								// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
+							}
+						}
 					}
 					else																											// If not paid
 					{
 						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
 						{
-							if(facilities.get(j).getFacilityID().matches(bookings.get(i).getFacilityID))										// Get facility for that booking
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
 							{
-								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();					// Put price in pay
+								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
 							}
 						}
 					}
-					if(bookings.getUserID.matches(loggedInUser))																						// If used a user with matching id
+					if(bookings.get(i).getUserID() == (loggedInUser))																						// If used a user with matching id
 					{
-						statement += bookings.get(i).getFacilityName() + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";			// Amend the relevant booking to statement
+						statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";			// Amend the relevant booking to statement
 					}
 				}
 			}
