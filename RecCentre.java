@@ -108,6 +108,7 @@ public class RecCentre
 					{
 						found = true;
 						isAdmin = users.get(i).getUserType() == 1;
+						loggedInUser = users.get(i).getUserID();
 					}
 				}
 				if (!found)
@@ -319,7 +320,7 @@ public class RecCentre
 					break;
 				
 				case 1:
-					// makeBooking(idToEdit);
+					makeBooking(idToEdit);
 					break;
 
 				case 2:
@@ -340,13 +341,6 @@ public class RecCentre
 
 	public static void viewFacilityAvailibilites(int idToEdit)
 	{
-		/* TODO:
-		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
-		 * - Take in 2 inputs a start date and an end date to check(inclusive)
-		 * - Bubble sort the bookings ArrayList by date first?
-		 * - Go through by the dates(index 3) and check the slot(index 4) use Nested for loops
-		 * - If statements that if it isn't in the booking Array add it to a string and JTextArea?
-		 */ 
 		 String startDate, endDate;
 		 startDate = JOptionPane.showInputDialog(null, "Check availabilities from what date? /n(dd/mm/yyyy)");
 		 endDate = JOptionPane.showInputDialog(null, "Until what date? /n(dd/mm/yyyy)");
@@ -376,15 +370,55 @@ public class RecCentre
 	
 	public static void makebooking(int idToEdit)
 	{
-		/* TODO:
-		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
-		 * - Get the facility to make the booking for and check it exists and isnt decommissioned
-		 * - Get user ID (another global variable?)
-		 * - Get the date from the user
-		 * - Get the time from the user (List options available? or list all options and then check if it is available?)
-		 * - Ask the user if payment has been made(if it has add Y to ArrayList otherwise N)
-		 * - Display a message to say that the booking has been made
-		 */
+		int bookingID, facilityID, userID, slotNumber;
+		LocalDate bookingDate;
+		boolean paid;
+		boolean decommissioned;
+		String date;
+		String[] dateArray;
+		boolean validDate = false;
+		while (!validDate)
+		{
+			date = JOptionPane.showInputDialog(null, "What date would you like to make the booking for? (dd-mm-yyyy)");
+			dateArray = date.split("-");
+			bookingDate = LocalDate.of(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[1]), Integer.parseInt(dateArray[0]));
+			boolean found = false;
+			int i;
+			for (i = 0; i < facilities.size() && !found; i++)
+			{
+				found = (facilities.get(i).getFacilityID() == idToEdit)
+			}
+			i--;
+			LocalDate decomissionUntil = facilities.get(i).getDecommissionUntilLocalDate();
+			if (bookingDate.isAfter(LocalDate.now()) && decommissionUntil.isBefore(bookingDate))//check that it isnt decommissioned at the time
+			{
+				validDate = true;
+				if (bookings.isEmpty)
+				{
+					bookingID = 0;
+				}
+				else
+				{
+					bookingID = (bookings.size()) + 1;
+				}
+				facilityID = idToEdit;
+				userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
+				slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n
+																		  Please enter in 24 hour format between 09 and 17"));
+				slotNumber = slotNumber - 8;
+				if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
+				"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+				{
+					paid = true;
+				}
+				else
+				{
+					paid = false;
+				}
+				Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
+				FileWriter writeBooking = new FileWriter("bookings.txt", true);
+				PrintWriter out = new PrintWriter(writeBooking);
+				out.println(newBooking);
 	}
 	
 	public static void ViewBookings(int idToView)

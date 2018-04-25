@@ -1,10 +1,11 @@
-/**
- * RecCentre
- */
 import java.util.*;			// Scanner
 import javax.swing.*;		// JOptionPane   +   JTextArea
 import java.io.*;			// IOException  +  Files
-import java.time.LocalDate;
+import java.time.*;
+
+/**
+ * RecCentre
+ */
 public class RecCentre
 {
 	public static ArrayList<Booking> bookings = new ArrayList<Booking>();
@@ -23,10 +24,10 @@ public class RecCentre
 			{
 				if (isAdmin) 
 				{
-					String[] options = {"Register a new user", "Add a new facility", "Edit or View a facility",
-										"Remove a facility", "Record Payments", "View Accounts"};
+					String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
+											 "Remove a facility", "Record Payments", "View Accounts"};
 					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+															JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
 					switch (inputNum)
 					{
 						case 0:
@@ -38,12 +39,13 @@ public class RecCentre
 							break;
 						
 						case 2: 
-							EditAndViewFacilities();
+							editAndViewFacilities();
+							break;
+						
+						case 3:
+							//Remove facility method
 							break;
 
-						case 3:
-							//Remove a facility method
-						
 						case 4:
 							// Record payments method
 							break;
@@ -59,13 +61,13 @@ public class RecCentre
 				}
 				else
 				{
-					String[] options = {"View your Bookings", "View your statements"};
+					String[] userOptions = {"View your Bookings", "View your statements"};
 					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION, 
-															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+															JOptionPane.QUESTION_MESSAGE, null, userOptions, "Quit");
 					switch (inputNum)
 					{
 						case 0:
-							UserViewBookings();
+							// userViewBookings();
 							break;
 						
 						case 1:
@@ -289,35 +291,54 @@ public class RecCentre
 	{
 		String[] facilitiesNames = new String[facilities.size()];
 		String facilityToEdit;
-		for (int i = 0; i < facilities.size() - 1; i++)
+		boolean idFound = false;
+		int idToEdit = 0;
+		try
 		{
-			facilitiesNames[i] = facilities.get(i).getFacilityName();
+			for (int i = 0; i < facilities.size(); i++)
+			{
+				facilitiesNames[i] = facilities.get(i).getFacilityName();
+			}
+			facilityToEdit = (String)(JOptionPane.showInputDialog(null, "What facility would you like to edit/view?",
+							"Choose a facility", 1, null, facilitiesNames, facilitiesNames[0]));
+			for (int i = 0; i < facilities.size() && !idFound; i++)
+			{
+				if (facilities.get(i).getFacilityName().equals(facilityToEdit))
+				{
+					idToEdit = facilities.get(i).getFacilityID();
+					idFound = true;
+				}
+			}
+			String[] options = {"View facility availability", "Make a booking", "View Bookings"};
+			int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+														JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+			switch(inputNum)
+			{
+				case 0:
+					viewFacilityAvailibilites(idToEdit);
+					break;
+				
+				case 1:
+					makeBooking(idToEdit);
+					break;
+
+				case 2:
+					viewBookings(idToEdit);
+					break;
+
+				default:
+					break;
+			}
 		}
-		facilityToEdit = JOptionPane.showInputDialog(null,"What facility would you like to edit/view?", "Choose a facility", 1,
-													 null, facilitiesNames, facilitiesNames[0]);
-		String[] options = {"View facility availability", "Make a booking", "View Bookings"}
-		int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-													JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
-		switch(inputNum)
+		catch (ArrayIndexOutOfBoundsException e)
 		{
-			case 0:
-				viewFacilityAvailibilites(facilityToEdit);
-				break;
+			//TODO: handle exception. Change to If statement
+			JOptionPane.showMessageDialog(null, "Error: No facilities registered. Please create a new facility before attempmting to view or edit.", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 			
-			case 1:
-				makeBooking(facilityToEdit);
-				break;
-
-			case 2:
-				adminViewBookings(facilityToEdit);
-				break;
-
-			default:
-				break;
-		}
 	}
 
-	public static void viewFacilityAvailibilites(String facilityToEdit)
+	public static void viewFacilityAvailibilites(int idToEdit)
 	{
 		/* TODO:
 		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
@@ -326,9 +347,37 @@ public class RecCentre
 		 * - Go through by the dates(index 3) and check the slot(index 4) use Nested for loops
 		 * - If statements that if it isn't in the booking Array add it to a string and JTextArea?
 		 */ 
+		 String startDate, endDate;
+		 startDate = JOptionPane.showInputDialog(null, "Check availabilities from what date? /n(dd/mm/yyyy)");
+		 endDate = JOptionPane.showInputDialog(null, "Until what date? /n(dd/mm/yyyy)");
+		 String[] startArray = startDate.split("/");
+		 String[] endArray = endDate.split("/");
+		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]));
+		 LocalDate localEndDate = LocalDate.of(Integer.parseInt(endArray[2]), Integer.parseInt(endArray[1]), Integer.parseInt(endArray[0]));
+		 LocalDate testDate;
+		 for (testDate = localStartDate; testDate.isBefore(localEndDate) || testDate.equals(localEndDate); testDate.plusDays(1))
+		 {
+			String output;
+			for (int i = 0; i < bookings.size(); i++)
+			{
+				if (bookings.get(i).getFacilityID() == idToEdit)
+				{
+					if (bookings.get(i).getBookingDate().equals(testDate))
+					{
+						for (int j = 1; j < 10; j++)
+						{
+							if (bookings.get(i).getSlotNumber() != j)
+							{
+								output = bookings.get(i) + "/n";
+							}
+						}
+					}
+				}
+			}
+		 }
 	}
 	
-	public static void makeBooking(String facilityToEdit)
+	public static void makeBooking(int idToEdit)
 	{
 		/* TODO:
 		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
@@ -339,21 +388,199 @@ public class RecCentre
 		 * - Ask the user if payment has been made(if it has add Y to ArrayList otherwise N)
 		 * - Display a message to say that the booking has been made
 		 */
+		int bookingID, facilityID, userID, slotNumber;
+		LocalDate bookingDate;
+		boolean paid;
+		boolean decommissioned;
+		String date;
+		String[] dateArray;
+		boolean validDate = false;
+		while (!validDate)
+		{
+			date = JOptionPane.showInputDialog(null, "What date would you like to make the booking for? (dd-mm-yyyy)");
+			dateArray = date.split("-");
+			bookingDate = LocalDate.of(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[1]), Integer.parseInt(dateArray[0]));
+			boolean found = false;
+			int i;
+			for (i = 0; i < facilities.size() && !found; i++)
+			{
+				found = (facilities.get(i).getFacilityID() == idToEdit)
+			}
+			i--;
+			LocalDate decomissionUntil = facilities.get(i).getDecommissionUntilLocalDate();
+			if (bookingDate.isAfter(LocalDate.now()) && decommissionUntil.isBefore(bookingDate))//check that it isnt decommissioned at the time
+			{
+				validDate = true;
+				if (bookings.isEmpty)
+				{
+					bookingID = 0;
+				}
+				else
+				{
+					bookingID = (bookings.size()) + 1;
+				}
+				facilityID = idToEdit;
+				userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
+				slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n
+																		  Please enter in 24 hour format between 09 and 17"));
+				slotNumber = slotNumber - 8;
+				if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
+				"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+				{
+					paid = true;
+				}
+				else
+				{
+					paid = false;
+				}
+				Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
+				FileWriter writeBooking = new FileWriter("bookings.txt", true);
+				PrintWriter out = new PrintWriter(writeBooking);
+				out.println(newBooking);
+			}
+		}
 	}
 	
-	public static void adminViewBookings()
+	public static void viewBookings(int idToView)
 	{
-		/* TODO:
-		 * - JTextArea of all of the Bookings ArrayList?
-		 */
+		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
+		int facilityID;
+		LocalDate bookingDate, dateToView;
+		String[] dateElements;
+		String dateString = JOptionPane.showInputDialog(null, "Please enter the date you would like to view in the format dd/mm/yyyy", "Enter date");
+		String output = "";
+		if (dateString.matches("[0-9]{2}/[0-9]{{1,2}/[0-9]{4}"))
+		{
+			dateElements = dateString.split("/");
+			dateToView = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]),
+									  Integer.parseInt(dateElements[0]));
+
+			if (isAdmin)
+			{
+				for (int i = 0; i < bookings.size(); i++)
+				{
+					facilityID = bookings.get(i).getFacilityID();
+					bookingDate = bookings.get(i).getBookingDate();
+					if (facilityID == idToView && bookingDate.isEqual(dateToView))
+					{
+						bookingsToView.add(bookings.get(i));
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < bookings.size(); i++)
+				{
+					facilityID = bookings.get(i).getFacilityID();
+					bookingDate = bookings.get(i).getBookingDate();
+					bookingUser = bookings.get(i).getUserID();
+					if (facilityID == idToView && bookingDate.isEqual(dateToView) &&
+						bookingUser == currentUser.getUserID())
+					{
+						bookingsToView.add(bookings.get(i));
+					}
+				}
+			}
+			if (bookingsToView.size() != 0)
+			{
+				String paid;
+				output += "These bookings are scheduled in this facility today:\n";
+				for (int i = 0; i < bookingsToView.size(); i++)
+				{
+					paid = "has not been paid";
+					if (bookingsToView.get(i).getPaymentStatus())
+					{
+						paid = "has been paid";
+					}
+					output += "User" + bookingsToView.get(i).getUserID() + " has a booking at " +
+							  (bookingsToView.get(i).getSlotNumber() + 8) + " and " + paid + "\n";
+				}
+			}
+			else
+			{
+				output += "No booking scheduled on the day entered.";
+			}
+		}
+		else
+		{
+			output += "Error: Invalid date format.";
+		}
+		JOptionPane.showMessageDialog(null, output, "Result", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
-	public static void userViewBookings()
-	{
-		/* TODO:
-		 * - Get the user ID (again global variable?)
-		 * - For Loop, read through the bookings ArrayList and check the userID for each one (index 2)
-		 * - If it equals the userID logged in add it to a string and use JTextArea?
-		 */
-	}
+	/**
+		  *	viewAccountStatement() can be called from the main
+		  * It reads the arraylists and checks the payment status of a user.
+		  * It can be accessed by both the admin and the user
+		  * If accessed by the admin, it displays all the facilities and the outstanding balances
+		  * If accessed by a user, it displays  all the outstanding balances for that user
+		  */
+		public static void viewAccountStatement()
+		{
+			String statement = "";																						// My vars
+			String pay = "";
+			String facilityCheck = "";
+			if(isAdmin)																										// If admin is logged on
+			{
+				for(int i = 0; i < bookings.size(); i++)															// Run through bookings
+				{
+					if(bookings.get(i).getPaymentStatus())														// If paid
+					{
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
+							{
+								pay = "has been paid";								// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
+							}
+						}
+					}
+					else																											// If not paid
+					{
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())										// Find the facility for that booking
+							{
+								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
+							}
+						}
+					}
+					statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";	// Ammend the whole thing onto statement
+				}
+			}
+			else																													// Is not admin
+			{
+				for(int i = 0; i < bookings.size(); i++)															// Run through bookings
+				{
+					if(bookings.get(i).getPaymentStatus())														// If paid
+					{
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
+							{
+								pay = "has been paid";								// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
+							}
+						}
+					}
+					else																											// If not paid
+					{
+						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						{
+							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
+							{
+								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
+								facilityCheck = facilities.get(j).getFacilityName();
+							}
+						}
+					}
+					if(bookings.get(i).getUserID() == (loggedInUser))																						// If used a user with matching id
+					{
+						statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";			// Amend the relevant booking to statement
+					}
+				}
+			}
+			JOptionPane.showMessageDialog(null, statement);											// Show the bookings
+		}
 }
