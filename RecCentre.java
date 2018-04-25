@@ -417,7 +417,8 @@ public class RecCentre
 					}
 				}
 			}
-		 }
+		}
+		JOptionPane.showMessageDialog(null, output);
 	}
 	
 	public static void makeBooking(int idToEdit) throws IOException
@@ -427,12 +428,19 @@ public class RecCentre
 		boolean paid;
 		boolean decommissioned;
 		String date;
+		String temp1 = "";
+		String temp2 = "";
 		String[] dateArray;
+		String pattern2 = "[0-9]{1,}";
 		String pattern = "[0-9]{2}-[0-9]{2}-[0-9]{4}";
 		boolean validDate = false;
 		while (!validDate)
 		{
 			date = JOptionPane.showInputDialog(null, "What date would you like to make the booking for? (dd-mm-yyyy)");
+			if(date == null)
+			{
+				mainInterface();
+			}
 			if(date.matches(pattern))
 			{
 				dateArray = date.split("-");
@@ -467,8 +475,26 @@ public class RecCentre
 							bookingID = (bookings.size()) + 1;
 						}
 						facilityID = idToEdit;
-						userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
-						slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n Please enter in 24 hour format between 09 and 17"));
+						temp1 = JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number");
+						if(temp1 == null)
+						{
+							mainInterface();
+						}
+						if(!(temp1.matches(pattern2)))
+						{
+							mainInterface();
+						}
+						userID = Integer.parseInt(temp1);
+						temp2 = JOptionPane.showInputDialog(null, "What time would you like to make the booking for? \n Please enter in 24 hour format between 09 and 17");
+						if(temp2 == null)
+						{
+							mainInterface();
+						}
+						if(!(temp2.matches(pattern2)))
+						{
+							mainInterface();
+						}
+						slotNumber = Integer.parseInt(temp2);
 						slotNumber = slotNumber - 8;
 						if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
 						"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
@@ -518,6 +544,8 @@ public class RecCentre
 						PrintWriter out = new PrintWriter(writeBooking);
 						out.println(newBooking);
 						JOptionPane.showMessageDialog(null, "Your booking has been successfully");
+						writeBooking.close();
+						out.close();
 					}
 				}
 			}
@@ -876,6 +904,7 @@ public class RecCentre
 												}
 												fr.close();
 												pr.close();
+												mainInterface();
 											}
 											else
 											{
@@ -895,6 +924,7 @@ public class RecCentre
 										mainInterface();
 									}
 					}
+					mainInterface();
 		}
 	}
 	
@@ -936,6 +966,10 @@ public class RecCentre
 				}
 			}
 			input = (String) JOptionPane.showInputDialog(null,"choose a facility:","Facility",JOptionPane.QUESTION_MESSAGE, null, options,options[0]); 
+			if(input == null || input.equals(""))
+			{
+				mainInterface();
+			}
 			for(int i = 0; i < facilities.size(); i++)
 			{
 				if(input.matches(facilities.get(i).getFacilityName()))
