@@ -362,7 +362,7 @@ public class RecCentre
 						idFound = true;
 					}
 				}
-				String[] options = {"View facility availability", "Make a booking", "View Bookings", "Decommission a facility", "Recommission a facility"};
+				String[] options = {"View facility availability", "Make a booking", "View Bookings", "Decommission a facility", "Recommission a facility", "Back"};
 				int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
 															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
 				switch(inputNum)
@@ -384,6 +384,10 @@ public class RecCentre
 						
 					case 4:
 						removeSuspension();
+						
+					case 5:
+						mainInterface();
+						break;
 						
 					default:
 						quit = true;
@@ -434,6 +438,11 @@ public class RecCentre
 				 }
 			 }
 			testDate = testDate.plusDays(1);
+		}
+		if(output.equals(""))
+		{
+			putout = "All slots are booked out";
+			output = "There are no free slots the the specified date range";
 		}
 		JOptionPane.showMessageDialog(null, putout + "\n" + output);
 	}
