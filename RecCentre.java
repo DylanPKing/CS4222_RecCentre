@@ -40,7 +40,7 @@ public class RecCentre
 					switch (inputNum)
 					{
 						case 0:
-							//registerUser();
+							registerUser();
 							break;
 						
 						case 1:
@@ -136,7 +136,7 @@ public class RecCentre
 	 * the administrator, and writes it to the Users object.
 	 * @param newUser
 	 */
-	public static void generatePassword(User newUser) throws IOException
+	public static String generatePassword() throws IOException
 	{
 		boolean validLength = false;
 		String strPassLength, diagText = "Please enter length of password:\n" +
@@ -157,7 +157,7 @@ public class RecCentre
 					poolChosen = (int)(Math.random() * passwordPool.length);
 					password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
 				}
-				newUser.setPassword(password);
+				return password;
 			}
 			else
 			{
@@ -165,6 +165,22 @@ public class RecCentre
 			}
 		}
 	}
+
+	public static void reisterUser()
+		{
+			int userID = users.size();
+			boolean validEmail = false;
+			while (!validEmail)
+			{
+				String email = JOptionPane.showInputDialog(null,"Please enter the amail address");
+				if (email.contains.contains("@") && (email.indexOf("@") != 0) && (email.indexOf("@") != email.length()-1))
+				{
+					validEmail = true;
+				}
+			}
+			String password = generatePassword();
+			User newUser = new User(userID, validEmail, password, 2);
+		}
 	
 	/**
 	  * fillArrayLists() is a method that is executed at the launch of the program

@@ -583,4 +583,51 @@ public class RecCentre
 			}
 			JOptionPane.showMessageDialog(null, statement);											// Show the bookings
 		}
+
+		public static String generatePassword()
+	{
+		boolean validLength = false;
+		String strPassLength, diagText = "Please enter length of password:\n" +
+										 "Must be between 8 and 50 characters.";
+		int passLength;
+		while (!validLength)
+		{
+			strPassLength = JOptionPane.showInputDialog(null, diagText, "Enter length", JOptionPane.PLAIN_MESSAGE);
+			if (strPassLength.matches("[0-9]{8,50}"))
+			{
+				passLength = Integer.parseInt(strPassLength);
+				validLength = true;
+				String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
+				String password = "";
+				int poolChosen;
+				for (int i = 0; i < passLength; i++)
+				{
+					poolChosen = (int)(Math.random() * passwordPool.length);
+					password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+				}
+				return password;
+			}
+			else
+			{
+				diagText = "Invalid input. Please enter a number between 8 and 50.";
+			}
+		}
+	}
+	
+
+		public static void reisterUser()
+		{
+			int userID = users.size();
+			boolean validEmail = false;
+			while (!validEmail)
+			{
+				String email = JOptionPane.showInputDialog(null,"Please enter the amail address");
+				if (email.contains.contains("@") && (email.indexOf("@") != 0) && (email.indexOf("@") != email.length()-1))
+				{
+					validEmail = true;
+				}
+			}
+			String password = generatePassword();
+			User newUser = new User(userID, validEmail, password, 2);
+		}
 }
