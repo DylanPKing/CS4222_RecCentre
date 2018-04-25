@@ -34,7 +34,7 @@ public class RecCentre
 		if (isAdmin) 
 				{
 					String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
-											 "Remove a facility", "Record Payments", "View Accounts"};
+											 "Remove a facility", "Record Payments", "View Accounts", "Quit"};
 					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
 															JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
 					switch (inputNum)
@@ -63,6 +63,9 @@ public class RecCentre
 							viewAccountStatement();
 							break;
 						
+						case 6:
+							System.exit(0);
+							break;
 						default:
 							quit = true;
 							break;
