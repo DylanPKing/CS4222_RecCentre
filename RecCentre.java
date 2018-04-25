@@ -395,6 +395,7 @@ public class RecCentre
 	{
 		 String startDate, endDate;
 		 String output = "";
+		 String putout = "The facility is free on:";
 		 startDate = JOptionPane.showInputDialog(null, "Check availabilities from what date? \n(dd/mm/yyyy)");
 		 endDate = JOptionPane.showInputDialog(null, "Until what date? \n(dd/mm/yyyy)");
 		 String[] startArray = startDate.split("/");
@@ -402,23 +403,31 @@ public class RecCentre
 		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]));
 		 LocalDate localEndDate = LocalDate.of(Integer.parseInt(endArray[2]), Integer.parseInt(endArray[1]), Integer.parseInt(endArray[0]));
 		 LocalDate testDate;
-		 for (testDate = localStartDate; testDate.isBefore(localEndDate) || testDate.equals(localEndDate); testDate.plusDays(1))
+		 for (testDate = localStartDate; testDate.isBefore(localEndDate) || testDate.equals(localEndDate);)
 		 {
-			for (int i = 0; i < bookings.size(); i++)
-			{
-				if (bookings.get(i).getBookingDate().equals(testDate))
+			 if(bookings.size() != 0)
+			 {
+				for (int i = 0; i < bookings.size(); i++)
 				{
-					for (int j = 1; j < 10; j++)
-					{
-						if (bookings.get(i).getSlotNumber() != j)
+						for (int j = 1; j < 10; j++)
 						{
-							output = bookings.get(i) + "/n";
+							if (bookings.get(i).getSlotNumber() != j)
+							{
+								output += testDate + " at " + (j + 8) + ":00" + "\n";
+							}
 						}
-					}
 				}
-			}
+			 }
+			 else
+			 {
+				 for(int j = 1; j < 10; j++)
+				 {
+					 output += testDate + " at " + (8 + j) + ":00" + "\n";
+				 }
+			 }
+			testDate = testDate.plusDays(1);
 		}
-		JOptionPane.showMessageDialog(null, output);
+		JOptionPane.showMessageDialog(null, putout + "\n" + output);
 	}
 	
 	public static void makeBooking(int idToEdit) throws IOException
