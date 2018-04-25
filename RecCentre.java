@@ -394,8 +394,9 @@ public class RecCentre
 	public static void viewFacilityAvailibilites(int idToEdit) throws IOException
 	{
 		 String startDate, endDate;
-		 startDate = JOptionPane.showInputDialog(null, "Check availabilities from what date? /n(dd/mm/yyyy)");
-		 endDate = JOptionPane.showInputDialog(null, "Until what date? /n(dd/mm/yyyy)");
+		 String output = "";
+		 startDate = JOptionPane.showInputDialog(null, "Check availabilities from what date? \n(dd/mm/yyyy)");
+		 endDate = JOptionPane.showInputDialog(null, "Until what date? \n(dd/mm/yyyy)");
 		 String[] startArray = startDate.split("/");
 		 String[] endArray = endDate.split("/");
 		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]));
@@ -403,7 +404,6 @@ public class RecCentre
 		 LocalDate testDate;
 		 for (testDate = localStartDate; testDate.isBefore(localEndDate) || testDate.equals(localEndDate); testDate.plusDays(1))
 		 {
-			String output;
 			for (int i = 0; i < bookings.size(); i++)
 			{
 				if (bookings.get(i).getBookingDate().equals(testDate))
