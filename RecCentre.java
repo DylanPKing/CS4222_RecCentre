@@ -185,7 +185,7 @@ public class RecCentre
 	public static void registerUser() throws IOException
 		{
 			String email = "";
-			int userID = users.size();
+			int userID = users.size() + 1;
 			boolean validEmail = false;
 			while (!validEmail)
 			{
@@ -197,6 +197,14 @@ public class RecCentre
 			}
 			String password = generatePassword();
 			User newUser = new User(userID, email, password, 2);
+			users.add(newUser);
+
+			FileWriter writeFile = new FileWriter("Users.txt", true);
+			PrintWriter out = new PrintWriter(writeFile);
+			out.println();
+			out.print(userID + "," + email + "," + password + ",2");
+			out.close();
+			writeFile.close();
 		}
 	
 	/**
@@ -520,6 +528,8 @@ public class RecCentre
 						PrintWriter out = new PrintWriter(writeBooking);
 						out.println(newBooking);
 						JOptionPane.showMessageDialog(null, "Your booking has been successfully");
+						out.close();
+						writeBooking.close();
 					}
 				}
 				else

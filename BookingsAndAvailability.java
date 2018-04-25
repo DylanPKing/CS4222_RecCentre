@@ -13,29 +13,38 @@ public class RecCentre
 	public static ArrayList<User> users = new ArrayList<User>();
 	public static boolean isAdmin;
 	public static int loggedInUser;
+	
 	public static void main(String[] args) throws IOException
 	{
 		fillArrayLists();
 		if(login())
 		{
-			int inputNum;
 			boolean quit = false;
 			while (!quit)
 			{
-				if (isAdmin) 
+				mainInterface();
+			}
+		}
+	}
+	
+	public static void mainInterface() throws IOException
+	{
+		int inputNum;
+		boolean quit = false;
+		if (isAdmin) 
 				{
 					String[] adminOptions = {"Register a new user", "Add a new facility", "Edit or View a facility", 
-											 "Remove a facility", "Record Payments", "View Accounts"};
+											 "Remove a facility", "Record Payments", "View Accounts", "Quit"};
 					inputNum = JOptionPane.showOptionDialog(null, "What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
 															JOptionPane.QUESTION_MESSAGE, null, adminOptions, "Quit");
 					switch (inputNum)
 					{
 						case 0:
-							// Register new user method
+							registerUser();
 							break;
 						
 						case 1:
-							// Add new facility method
+							createFacility();
 							break;
 						
 						case 2: 
@@ -43,17 +52,20 @@ public class RecCentre
 							break;
 						
 						case 3:
-							//Remove facility method
+							deleteFacility();
 							break;
 
 						case 4:
-							// Record payments method
+							// Record payments method     needs confirmation
 							break;
 							
 						case 5:
-							// View account statements
+							viewAccountStatement();
 							break;
 						
+						case 6:
+							System.exit(0);
+							break;
 						default:
 							quit = true;
 							break;
@@ -67,11 +79,11 @@ public class RecCentre
 					switch (inputNum)
 					{
 						case 0:
-							// userViewBookings();
+							viewBookings();
 							break;
 						
 						case 1:
-							// View statement
+							viewAccountStatement();
 							break;
 							
 						default:
@@ -79,15 +91,14 @@ public class RecCentre
 							break;
 					}
 				}
-			}
-		}
 	}
+	
 	/**
 	 * Takes in an email and password from the user, and checks it against
 	 * the existing user objects.
 	 * @return true if valid login
 	 */
-	public static boolean login()
+	public static boolean login() throws IOException
 	{
 		String email, password;
 		int attempt;
@@ -108,6 +119,7 @@ public class RecCentre
 					{
 						found = true;
 						isAdmin = users.get(i).getUserType() == 1;
+						loggedInUser = users.get(i).getUserID();
 					}
 				}
 				if (!found)
@@ -116,6 +128,11 @@ public class RecCentre
 							" attempts remaining. Please enter email again:";
 					passMsg = "Please enter password again";
 				}
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "Closing Application");
+				System.exit(0);
 			}
 		}
 		return found;
@@ -127,8 +144,10 @@ public class RecCentre
 	 * the administrator, and writes it to the Users object.
 	 * @param newUser
 	 */
-	public static void generatePassword(User newUser)
+	public static String generatePassword() throws IOException
 	{
+		String password = "";
+		String pattern = "[0-9]{1,2}";
 		boolean validLength = false;
 		String strPassLength, diagText = "Please enter length of password:\n" +
 										 "Must be between 8 and 50 characters.";
@@ -136,26 +155,49 @@ public class RecCentre
 		while (!validLength)
 		{
 			strPassLength = JOptionPane.showInputDialog(null, diagText, "Enter length", JOptionPane.PLAIN_MESSAGE);
-			if (strPassLength.matches("[0-9]{8,50}"))
+			if (strPassLength.matches(pattern))
 			{
 				passLength = Integer.parseInt(strPassLength);
-				validLength = true;
-				String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
-				String password = "";
-				int poolChosen;
-				for (int i = 0; i < passLength; i++)
+				if(passLength > 7 && passLength < 51)
 				{
-					poolChosen = (int)(Math.random() * passwordPool.length);
-					password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+					validLength = true;
+					String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
+					int poolChosen;
+					for (int i = 0; i < passLength; i++)
+					{
+						poolChosen = (int)(Math.random() * passwordPool.length);
+						password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+					}
 				}
-				newUser.setPassword(password);
+				else
+				{
+					diagText = "Invalid input. Please enter a number between 8 and 50";
+				}
 			}
 			else
 			{
 				diagText = "Invalid input. Please enter a number between 8 and 50.";
 			}
 		}
+		return password;
 	}
+
+	public static void registerUser() throws IOException
+		{
+			String email = "";
+			int userID = users.size();
+			boolean validEmail = false;
+			while (!validEmail)
+			{
+				email = JOptionPane.showInputDialog(null,"Please enter the email address");
+				if (email.contains("@") && (email.indexOf("@") != 0) && (email.indexOf("@") != email.length()-1))
+				{
+					validEmail = true;
+				}
+			}
+			String password = generatePassword();
+			User newUser = new User(userID, email, password, 2);
+		}
 	
 	/**
 	  * fillArrayLists() is a method that is executed at the launch of the program
@@ -287,66 +329,70 @@ public class RecCentre
 		return paid;
 	}
 	
-	public static void editAndViewFacilities()
+	public static void editAndViewFacilities() throws IOException
 	{
 		String[] facilitiesNames = new String[facilities.size()];
 		String facilityToEdit;
 		boolean idFound = false;
+		boolean quit = false;
 		int idToEdit = 0;
 		try
 		{
-			for (int i = 0; i < facilities.size(); i++)
+			while(!quit)
 			{
-				facilitiesNames[i] = facilities.get(i).getFacilityName();
-			}
-			facilityToEdit = (String)(JOptionPane.showInputDialog(null, "What facility would you like to edit/view?",
-							"Choose a facility", 1, null, facilitiesNames, facilitiesNames[0]));
-			for (int i = 0; i < facilities.size() && !idFound; i++)
-			{
-				if (facilities.get(i).getFacilityName().equals(facilityToEdit))
+				for (int i = 0; i < facilities.size(); i++)
 				{
-					idToEdit = facilities.get(i).getFacilityID();
-					idFound = true;
+					facilitiesNames[i] = facilities.get(i).getFacilityName();
+				}
+				facilityToEdit = (String)(JOptionPane.showInputDialog(null, "What facility would you like to edit/view?",
+								"Choose a facility", 1, null, facilitiesNames, facilitiesNames[0]));
+				for (int i = 0; i < facilities.size() && !idFound; i++)
+				{
+					if (facilities.get(i).getFacilityName().equals(facilityToEdit))
+					{
+						idToEdit = facilities.get(i).getFacilityID();
+						idFound = true;
+					}
+				}
+				String[] options = {"View facility availability", "Make a booking", "View Bookings", "Decommission a facility", "Recommission a facility"};
+				int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
+															JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
+				switch(inputNum)
+				{
+					case 0:
+						viewFacilityAvailibilites(idToEdit);
+						break;
+					
+					case 1:
+						makeBooking(idToEdit);
+						break;
+
+					case 2:
+						viewBookings();
+						break;
+
+					case 3:
+						suspendFacility();
+						
+					case 4:
+						removeSuspension();
+						
+					default:
+						quit = true;
+						break;
+					}
 				}
 			}
-			String[] options = {"View facility availability", "Make a booking", "View Bookings"};
-			int inputNum = JOptionPane.showOptionDialog(null,"What would you like to do?", "Options", JOptionPane.YES_NO_CANCEL_OPTION,
-														JOptionPane.QUESTION_MESSAGE, null, options, "Quit");
-			switch(inputNum)
+			catch (ArrayIndexOutOfBoundsException e)
 			{
-				case 0:
-					viewFacilityAvailibilites(idToEdit);
-					break;
-				
-				case 1:
-					makeBooking(idToEdit);
-					break;
-
-				case 2:
-					viewBookings(idToEdit);
-					break;
-
-				default:
-					break;
+				//TODO: handle exception. Change to If statement
+				JOptionPane.showMessageDialog(null, "Error: No facilities registered. Please create a new facility before attempmting to view or edit.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		catch (ArrayIndexOutOfBoundsException e)
-		{
-			//TODO: handle exception. Change to If statement
-			JOptionPane.showMessageDialog(null, "Error: No facilities registered. Please create a new facility before attempmting to view or edit.", "Error", JOptionPane.ERROR_MESSAGE);
-		}
-			
-	}
+	
 
-	public static void viewFacilityAvailibilites(int idToEdit)
+	public static void viewFacilityAvailibilites(int idToEdit) throws IOException
 	{
-		/* TODO:
-		 * - Ask which facility to check the avalibility for (List? or regular input and then check if it exists or is decommissioned)
-		 * - Take in 2 inputs a start date and an end date to check(inclusive)
-		 * - Bubble sort the bookings ArrayList by date first?
-		 * - Go through by the dates(index 3) and check the slot(index 4) use Nested for loops
-		 * - If statements that if it isn't in the booking Array add it to a string and JTextArea?
-		 */ 
 		 String startDate, endDate;
 		 startDate = JOptionPane.showInputDialog(null, "Check availabilities from what date? /n(dd/mm/yyyy)");
 		 endDate = JOptionPane.showInputDialog(null, "Until what date? /n(dd/mm/yyyy)");
@@ -360,98 +406,168 @@ public class RecCentre
 			String output;
 			for (int i = 0; i < bookings.size(); i++)
 			{
-				if (bookings.get(i).getFacilityID() == idToEdit)
+				if (bookings.get(i).getBookingDate().equals(testDate))
 				{
-					if (bookings.get(i).getBookingDate().equals(testDate))
+					for (int j = 1; j < 10; j++)
 					{
-						for (int j = 1; j < 10; j++)
+						if (bookings.get(i).getSlotNumber() != j)
 						{
-							if (bookings.get(i).getSlotNumber() != j)
-							{
-								output = bookings.get(i) + "/n";
-							}
+							output = bookings.get(i) + "/n";
 						}
 					}
 				}
 			}
-		 }
+		}
+		JOptionPane.showMessageDialog(null, output);
 	}
 	
-	public static void makeBooking(int idToEdit)
+	public static void makeBooking(int idToEdit) throws IOException
 	{
-		/* TODO:
-		 * - Get the booking ID from the last entry in the booking Array (Sort by Booking ID first)
-		 * - Get the facility to make the booking for and check it exists and isnt decommissioned
-		 * - Get user ID (another global variable?)
-		 * - Get the date from the user
-		 * - Get the time from the user (List options available? or list all options and then check if it is available?)
-		 * - Ask the user if payment has been made(if it has add Y to ArrayList otherwise N)
-		 * - Display a message to say that the booking has been made
-		 */
 		int bookingID, facilityID, userID, slotNumber;
-		LocalDate bookingDate;
+		LocalDate bookingDate = null;
 		boolean paid;
 		boolean decommissioned;
 		String date;
+		String temp1 = "";
+		String temp2 = "";
 		String[] dateArray;
+		String pattern2 = "[0-9]{1,}";
+		String pattern = "[0-9]{2}-[0-9]{2}-[0-9]{4}";
 		boolean validDate = false;
 		while (!validDate)
 		{
 			date = JOptionPane.showInputDialog(null, "What date would you like to make the booking for? (dd-mm-yyyy)");
-			dateArray = date.split("-");
-			bookingDate = LocalDate.of(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[1]), Integer.parseInt(dateArray[0]));
-			boolean found = false;
-			int i;
-			for (i = 0; i < facilities.size() && !found; i++)
+			if(date == null)
 			{
-				found = (facilities.get(i).getFacilityID() == idToEdit)
+				mainInterface();
 			}
-			i--;
-			LocalDate decomissionUntil = facilities.get(i).getDecommissionUntilLocalDate();
-			if (bookingDate.isAfter(LocalDate.now()) && decommissionUntil.isBefore(bookingDate))//check that it isnt decommissioned at the time
+			if(date.matches(pattern))
 			{
-				validDate = true;
-				if (bookings.isEmpty)
+				dateArray = date.split("-");
+				try
 				{
-					bookingID = 0;
+					bookingDate = LocalDate.of(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[1]), Integer.parseInt(dateArray[0]));
+				}
+				catch(Exception e)
+				{
+					JOptionPane.showMessageDialog(null, "The date supplied is not a real date");
+					makeBooking(idToEdit);
+				}
+				boolean found = false;
+				int i;
+				for (i = 0; i < facilities.size() && !found; i++)
+				{
+					found = (facilities.get(i).getFacilityID() == idToEdit);
+				}
+				i--;
+				LocalDate decommissionUntil = facilities.get(i).getDecommissionedUntilLocalDate();
+				if(decommissionUntil == null)
+				{
+					if (bookingDate.isAfter(LocalDate.now()))//check that it isnt decommissioned at the time
+					{
+						validDate = true;
+						if (bookings.isEmpty())
+						{
+							bookingID = 0;
+						}
+						else
+						{
+							bookingID = (bookings.size()) + 1;
+						}
+						facilityID = idToEdit;
+						temp1 = JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number");
+						if(temp1 == null)
+						{
+							mainInterface();
+						}
+						if(!(temp1.matches(pattern2)))
+						{
+							mainInterface();
+						}
+						userID = Integer.parseInt(temp1);
+						temp2 = JOptionPane.showInputDialog(null, "What time would you like to make the booking for? \n Please enter in 24 hour format between 09 and 17");
+						if(temp2 == null)
+						{
+							mainInterface();
+						}
+						if(!(temp2.matches(pattern2)))
+						{
+							mainInterface();
+						}
+						slotNumber = Integer.parseInt(temp2);
+						slotNumber = slotNumber - 8;
+						if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
+						"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							paid = true;
+						}
+						else
+						{
+							paid = false;
+						}
+						Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
+						bookings.add(newBooking);
+						FileWriter writeBooking = new FileWriter("bookings.txt", true);
+						PrintWriter out = new PrintWriter(writeBooking);
+						out.println(newBooking);
+						JOptionPane.showMessageDialog(null, "Your booking has been successfully");
+					}
 				}
 				else
 				{
-					bookingID = (bookings.size()) + 1;
+					if (bookingDate.isAfter(LocalDate.now()) && decommissionUntil.isBefore(bookingDate))//check that it isnt decommissioned at the time
+					{
+						validDate = true;
+						if (bookings.isEmpty())
+						{
+							bookingID = 0;
+						}
+						else
+						{
+							bookingID = (bookings.size()) + 1;
+						}
+						facilityID = idToEdit;
+						userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
+						slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n Please enter in 24 hour format between 09 and 17"));
+						slotNumber = slotNumber - 8;
+						if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
+						"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							paid = true;
+						}
+						else
+						{
+							paid = false;
+						}
+						Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
+						FileWriter writeBooking = new FileWriter("bookings.txt", true);
+						PrintWriter out = new PrintWriter(writeBooking);
+						out.println(newBooking);
+						JOptionPane.showMessageDialog(null, "Your booking has been successfully");
+						writeBooking.close();
+						out.close();
+					}
 				}
-				facilityID = idToEdit;
-				userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
-				slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n
-																		  Please enter in 24 hour format between 09 and 17"));
-				slotNumber = slotNumber - 8;
-				if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
-				"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
-				{
-					paid = true;
-				}
-				else
-				{
-					paid = false;
-				}
-				Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
-				FileWriter writeBooking = new FileWriter("bookings.txt", true);
-				PrintWriter out = new PrintWriter(writeBooking);
-				out.println(newBooking);
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "Invalid format supplied");
 			}
 		}
 	}
 	
-	public static void viewBookings(int idToView)
+	public static void viewBookings() throws IOException
 	{
 		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
 		int facilityID;
+		int bookingUser = 0;
 		LocalDate bookingDate, dateToView;
 		String[] dateElements;
-		String dateString = JOptionPane.showInputDialog(null, "Please enter the date you would like to view in the format dd/mm/yyyy", "Enter date");
+		String dateString = JOptionPane.showInputDialog(null, "Please enter the date you would like to view in the format dd-mm-yyyy", "Enter date");
 		String output = "";
-		if (dateString.matches("[0-9]{2}/[0-9]{{1,2}/[0-9]{4}"))
+		if (dateString.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}"))
 		{
-			dateElements = dateString.split("/");
+			dateElements = dateString.split("-");
 			dateToView = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]),
 									  Integer.parseInt(dateElements[0]));
 
@@ -461,7 +577,7 @@ public class RecCentre
 				{
 					facilityID = bookings.get(i).getFacilityID();
 					bookingDate = bookings.get(i).getBookingDate();
-					if (facilityID == idToView && bookingDate.isEqual(dateToView))
+					if (bookingDate.isEqual(dateToView))
 					{
 						bookingsToView.add(bookings.get(i));
 					}
@@ -474,8 +590,8 @@ public class RecCentre
 					facilityID = bookings.get(i).getFacilityID();
 					bookingDate = bookings.get(i).getBookingDate();
 					bookingUser = bookings.get(i).getUserID();
-					if (facilityID == idToView && bookingDate.isEqual(dateToView) &&
-						bookingUser == currentUser.getUserID())
+					if (bookingDate.isEqual(dateToView) &&
+						bookingUser == loggedInUser)
 					{
 						bookingsToView.add(bookings.get(i));
 					}
@@ -515,7 +631,7 @@ public class RecCentre
 		  * If accessed by the admin, it displays all the facilities and the outstanding balances
 		  * If accessed by a user, it displays  all the outstanding balances for that user
 		  */
-		public static void viewAccountStatement()
+		public static void viewAccountStatement() throws IOException
 		{
 			String statement = "";																						// My vars
 			String pay = "";
@@ -583,51 +699,402 @@ public class RecCentre
 			}
 			JOptionPane.showMessageDialog(null, statement);											// Show the bookings
 		}
-
-		public static String generatePassword()
+		
+		public static void createFacility() throws IOException
 	{
-		boolean validLength = false;
-		String strPassLength, diagText = "Please enter length of password:\n" +
-										 "Must be between 8 and 50 characters.";
-		int passLength;
-		while (!validLength)
-		{
-			strPassLength = JOptionPane.showInputDialog(null, diagText, "Enter length", JOptionPane.PLAIN_MESSAGE);
-			if (strPassLength.matches("[0-9]{8,50}"))
-			{
-				passLength = Integer.parseInt(strPassLength);
-				validLength = true;
-				String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
-				String password = "";
-				int poolChosen;
-				for (int i = 0; i < passLength; i++)
+		String input, input2, filename, error1, error2, pattern, facilityName;
+		int facilityID = 0;
+		String price = "";
+		double pricePerHour = 0.0;
+		error1 = "Goodbye";
+		error2 = "Please enter a valid facility name";
+		pattern = "[a-zA-z' ]{1,}";
+		String numPattern = "[0-9]{1,2}.[0-9]{2}";
+		input2 = " ";
+		facilityName = " ";
+		filename = "Facilities.txt";
+		FileWriter fr = new FileWriter(filename, true);
+		PrintWriter pr = new PrintWriter(fr);
+		facilityName = makeName();
+		pricePerHour = makePrice();
+		
+				facilityID = generateID();
+				facilities.add(new Facility(facilityID, facilityName, pricePerHour));
+				pr.print(facilityID +","+ facilityName +","+ pricePerHour);
+				pr.println();
+				fr.close();
+				pr.close();
+	
+			String [] choices = {"Yes", "No"};
+			String selection = (String) JOptionPane.showInputDialog(
+			null, "Would you like to create another facility?", "Create", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+				if(selection != null)
 				{
-					poolChosen = (int)(Math.random() * passwordPool.length);
-					password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+					if(selection.matches(choices[0]))
+					{
+						createFacility();
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(null, "Returning to menu");
+					}
 				}
-				return password;
-			}
-			else
+				else
+				{
+					JOptionPane.showMessageDialog(null, "Returning to menu");
+					mainInterface();
+				}
+	}
+			
+	
+	
+	public static String makeName() throws IOException
+	{
+		String facilityName = JOptionPane.showInputDialog(null, "Enter facility name");
+		if(facilityName == null)
+		{
+			JOptionPane.showMessageDialog(null, "Creation aborted\nReturning to main menu");
+			mainInterface();
+		}
+		if(facilityName.equals(""))
+		{
+			JOptionPane.showMessageDialog(null, "No name provided\nPlease supply a name for the facility");
+			makeName();
+		}
+		for(int i = 0; i < facilities.size(); i++)
+		{
+			if(facilityName.equals(facilities.get(i).getFacilityName()))
 			{
-				diagText = "Invalid input. Please enter a number between 8 and 50.";
+				JOptionPane.showMessageDialog(null, "You already have a facility with this name", "Error", 2);
+				makeName();
 			}
+		}
+		return facilityName;
+	}
+	
+	public static double makePrice() throws IOException
+	{
+		String price = JOptionPane.showInputDialog(null, "Enter the price per hour\nUse the range(0.01 - 99.99)");
+		double actualPrice = 0.0;
+		String pattern = "[0-9]{1,2}.[0-9]{2}";
+		if(price == null)
+		{
+			JOptionPane.showMessageDialog(null, "Creation aborted\nReturning to the main menu");
+			mainInterface();
+		}
+		if(price.equals(""))
+		{
+			JOptionPane.showMessageDialog(null, "No Price put in\nPut in a price");
+			makePrice();
+		}
+		if(!(price.matches(pattern)))
+		{
+			JOptionPane.showMessageDialog(null, "Invalid price input");
+			makePrice();
+		}
+		actualPrice = Double.parseDouble(price);
+		return actualPrice;
+	}
+	
+	public static int generateID()
+	{
+		int uniqueId;
+		uniqueId = (int)(Math.random() * 500 + 1);
+		for(int i = 0; i < facilities.size(); i++)
+		{
+			if(facilities.get(i).getFacilityID() == uniqueId)
+			{
+				generateID();
+			}
+		}
+		return uniqueId;
+			
+	}
+	
+	public static void suspendFacility() throws IOException
+	{
+		/*string array choices, JOptionPane.QUESTION_MESSAGE, getFacilityName plug in to choices, 
+		*/
+		
+		String filename = "Facilities.txt";
+		String file = "";
+		FileWriter fr = new FileWriter(filename, false);
+		PrintWriter pr = new PrintWriter(fr);
+		
+		String suspendedFacilityName = "";
+		int suspendedFacilityID = 0;
+		double suspendedPricePerHour = 0.0;
+		String pattern = "[0-9]{4}/[0-9]{2}/[0-9]{2}";
+		LocalDate temp;
+		
+		boolean found = false;
+		String dateInput = "";
+		LocalDate decommissionDate = null;
+	
+		String error1 = "Goodbye";
+		String error2 = "Please provide a valid date in the format yyyy/mm/dd";
+		
+		String [] dateSplit; //Not specifing array size due to the nature of .split method
+		
+		if(facilities.size() > 0)
+		{
+			
+			String [] choices = new String[facilities.size()];
+			for(int i = 0; i < facilities.size(); i++)
+			{
+				choices [i] = facilities.get(i).getFacilityName();
+			}
+			String selection = (String) JOptionPane.showInputDialog(
+				null, "Would you like to suspend a facility?", "Suspend", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+					if(selection != null)
+					{
+						for(int j = 0; j < choices.length && !found; j++)
+						{
+							if(selection.matches(choices[j]))
+							{
+								suspendedFacilityName = facilities.get(j).getFacilityName();
+								suspendedFacilityID = facilities.get(j).getFacilityID();
+								suspendedPricePerHour = facilities.get(j).getPricePerHour();
+								//take this object and bring them back with some motherfucking dates
+								dateInput = JOptionPane.showInputDialog(null, "Please supply the date you wish to decommission this facility until in the format yyyy/mm/dd");
+								//validate format
+								found = true;
+								facilities.remove(j);
+							}
+						}
+							if(dateInput != null)
+									{
+										if(!(dateInput.equals("")))
+										{
+											if(dateInput.matches(pattern))//For now assume valid date, will need to revise due to 9111/70/43 etc
+											{
+												dateSplit = dateInput.split("/");
+												try
+												{
+													decommissionDate = LocalDate.of(Integer.parseInt(dateSplit[0]), Integer.parseInt(dateSplit[1]), Integer.parseInt(dateSplit[2]));
+												}
+												catch (Exception e)
+												{
+													JOptionPane.showMessageDialog(null, "Invalid date entered"); 
+													createFacility();
+												}
+												facilities.add(new Facility(suspendedFacilityID, suspendedFacilityName, suspendedPricePerHour, decommissionDate));
+									
+												pr.print("");
+												pr.close();
+												fr.close();
+												fr = new FileWriter(filename, true);
+												pr = new PrintWriter(fr);
+												
+												for(int i = 0; i < facilities.size(); i++)
+												{
+													temp = facilities.get(i).getDecommissionedUntilLocalDate();
+													if(temp == null)
+													{
+														file = facilities.get(i).getFacilityID() + "," + facilities.get(i).getFacilityName() + "," + facilities.get(i).getPricePerHour();
+														pr.print(file);
+														pr.println();
+													}
+													else
+													{
+														file = facilities.get(i).getFacilityID() + "," + facilities.get(i).getFacilityName() + "," + facilities.get(i).getPricePerHour() + "," + facilities.get(i).getDecommissionedUntilLocalDate();
+														pr.print(file);
+														pr.println();
+													}
+												}
+												fr.close();
+												pr.close();
+												mainInterface();
+											}
+											else
+											{
+												JOptionPane.showMessageDialog(null, error2);
+												mainInterface();
+											}
+										}
+										else
+										{
+											JOptionPane.showMessageDialog(null, error2);
+											mainInterface();
+										}
+									}
+									else
+									{
+										JOptionPane.showMessageDialog(null, error2);
+										mainInterface();
+									}
+					}
+					mainInterface();
 		}
 	}
 	
-
-		public static void reisterUser()
+	public static void removeSuspension() throws IOException
+	{
+		String options[];
+		String [] valids = {"Yes", "No"};
+		String input;
+		String file = "";
+		int count = 0;
+		int token = 0;
+		String recommissionedName = "";
+		int recommissionedID = 0;
+		double recommissionedPricePerHour = 0.0;
+		LocalDate temp;
+		
+		String filename = "Facilities.txt";
+		FileWriter fr = new FileWriter(filename, false);
+		PrintWriter pr = new PrintWriter(fr);
+		
+		for(int i = 0; i < facilities.size(); i++)
 		{
-			int userID = users.size();
-			boolean validEmail = false;
-			while (!validEmail)
+			temp = facilities.get(i).getDecommissionedUntilLocalDate();
+			if(temp != null)
 			{
-				String email = JOptionPane.showInputDialog(null,"Please enter the amail address");
-				if (email.contains.contains("@") && (email.indexOf("@") != 0) && (email.indexOf("@") != email.length()-1))
+				count++;
+			}
+		}
+		if(count != 0)
+		{
+			options = new String[count];
+			for(int i = 0; i < facilities.size(); i++)
+			{
+				temp = facilities.get(i).getDecommissionedUntilLocalDate();
+				if(temp != null)
 				{
-					validEmail = true;
+					options[token] = facilities.get(i).getFacilityName();
+					token++;
 				}
 			}
-			String password = generatePassword();
-			User newUser = new User(userID, validEmail, password, 2);
+			input = (String) JOptionPane.showInputDialog(null,"choose a facility:","Facility",JOptionPane.QUESTION_MESSAGE, null, options,options[0]); 
+			if(input == null || input.equals(""))
+			{
+				mainInterface();
+			}
+			for(int i = 0; i < facilities.size(); i++)
+			{
+				if(input.matches(facilities.get(i).getFacilityName()))
+				{
+					recommissionedID = facilities.get(i).getFacilityID();
+					recommissionedName = facilities.get(i).getFacilityName();
+					recommissionedPricePerHour = facilities.get(i).getPricePerHour();
+					String validation = (String) JOptionPane.showInputDialog(null, "Are you sure you want to recommission this facility?", "Recommission Menu", JOptionPane.QUESTION_MESSAGE,null, valids, valids[0]);
+					if(validation.equals(valids[0]))
+					{
+						facilities.remove(i);
+					}
+					else
+					{
+						mainInterface();
+					}
+				}
+			}
+			facilities.add(new Facility(recommissionedID, recommissionedName, recommissionedPricePerHour));
+			
+			pr.print("");
+			fr.close();
+			pr.close();
+			fr = new FileWriter(filename, true);
+			pr = new PrintWriter(fr);
+			
+			for(int i = 0; i < facilities.size(); i++)
+			{
+				temp = facilities.get(i).getDecommissionedUntilLocalDate();
+				if(temp == null)
+				{
+					file = facilities.get(i).getFacilityID() + "," + facilities.get(i).getFacilityName() + "," + facilities.get(i).getPricePerHour();
+					pr.print(file);
+					pr.println();
+				}
+				else
+				{
+					file = facilities.get(i).getFacilityID() + "," + facilities.get(i).getFacilityName() + "," + facilities.get(i).getPricePerHour() + "," + facilities.get(i).getDecommissionedUntilLocalDate();
+					pr.print(file);
+					pr.println();
+				}
+			}
+			fr.close();
+			pr.close();
 		}
+		else
+		{
+			JOptionPane.showMessageDialog(null, "There are no facilities to recommission");
+			mainInterface();
+		}
+	}
+	
+	public static void deleteFacility() throws IOException
+	{
+		//permanently delete facilities
+		
+		String error1 = "Goodbye";
+		String filename = "Facilities.txt";
+		String file = "";
+		LocalDate temp;
+		FileWriter fr = new FileWriter(filename, false);
+		PrintWriter pr = new PrintWriter(fr);
+		
+		String [] valids = {"Yes", "No"};
+		String [] choices = new String[facilities.size()];
+		
+		if(facilities.size() > 0)
+		{
+			for(int i = 0; i < facilities.size(); i++)
+			{
+				choices [i] = facilities.get(i).getFacilityName();
+			}
+			String selection = (String) JOptionPane.showInputDialog(
+				null, "Would you like to remove a facility?", "Remove", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+					if(selection != null)
+					{
+						for(int j = 0; j < choices.length; j++)
+						{
+							if(selection.equals(choices[j]))
+							{
+								String validation = (String) JOptionPane.showInputDialog(null, "Are you sure you want to remove this facility?", "Delete Menu", JOptionPane.QUESTION_MESSAGE,null, valids, valids[0]);
+								if(validation.equals(valids[0]))
+								{
+									facilities.remove(j);
+								}
+								else
+								{
+									mainInterface();
+								}
+							}
+						}
+						pr.print("");
+						fr.close();
+						pr.close();
+						fr = new FileWriter(filename, true);
+						pr = new PrintWriter(fr);
+						
+						for(int i = 0; i < facilities.size(); i++)
+						{
+							temp = facilities.get(i).getDecommissionedUntilLocalDate();
+							if(temp == null)
+							{
+								file = facilities.get(i).getFacilityID() + "," + facilities.get(i).getFacilityName() + "," + facilities.get(i).getPricePerHour();
+								pr.print(file);
+								pr.println();
+							}
+							else
+							{
+								file = facilities.get(i).getFacilityID() + "," + facilities.get(i).getFacilityName() + "," + facilities.get(i).getPricePerHour() + "," + facilities.get(i).getDecommissionedUntilLocalDate();
+								pr.print(file);
+								pr.println();
+							}
+						}
+						fr.close();
+						pr.close();
+					}
+					else
+					{
+						JOptionPane.showMessageDialog(null, "Returning to main menu");
+						mainInterface();
+					}
+		
+		}
+		else
+		JOptionPane.showMessageDialog(null, "There are no facilities to delete");
+		mainInterface();
+	}
 }
