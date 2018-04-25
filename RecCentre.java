@@ -76,7 +76,7 @@ public class RecCentre
 					switch (inputNum)
 					{
 						case 0:
-							viewBookings(loggedInUser);
+							viewBookings();
 							break;
 						
 						case 1:
@@ -126,6 +126,11 @@ public class RecCentre
 					passMsg = "Please enter password again";
 				}
 			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "Closing Application");
+				System.exit(0);
+			}
 		}
 		return found;
 	}
@@ -138,6 +143,8 @@ public class RecCentre
 	 */
 	public static String generatePassword() throws IOException
 	{
+		String password = "";
+		String pattern = "[0-9]{1,2}";
 		boolean validLength = false;
 		String strPassLength, diagText = "Please enter length of password:\n" +
 										 "Must be between 8 and 50 characters.";
@@ -145,41 +152,48 @@ public class RecCentre
 		while (!validLength)
 		{
 			strPassLength = JOptionPane.showInputDialog(null, diagText, "Enter length", JOptionPane.PLAIN_MESSAGE);
-			if (strPassLength.matches("[0-9]{8,50}"))
+			if (strPassLength.matches(pattern))
 			{
 				passLength = Integer.parseInt(strPassLength);
-				validLength = true;
-				String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
-				String password = "";
-				int poolChosen;
-				for (int i = 0; i < passLength; i++)
+				if(passLength > 7 && passLength < 51)
 				{
-					poolChosen = (int)(Math.random() * passwordPool.length);
-					password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+					validLength = true;
+					String[] passwordPool = {"qwertyuiopasdfghjklzxcvbnm", "QWERTYUIOPASDFGHJKLZXCVBNM", "!£$%&*()?<>#/"};
+					int poolChosen;
+					for (int i = 0; i < passLength; i++)
+					{
+						poolChosen = (int)(Math.random() * passwordPool.length);
+						password += passwordPool[poolChosen].charAt((int)(Math.random() * passwordPool[poolChosen].length()));
+					}
 				}
-				return password;
+				else
+				{
+					diagText = "Invalid input. Please enter a number between 8 and 50";
+				}
 			}
 			else
 			{
 				diagText = "Invalid input. Please enter a number between 8 and 50.";
 			}
 		}
+		return password;
 	}
 
-	public static void reisterUser()
+	public static void registerUser() throws IOException
 		{
+			String email = "";
 			int userID = users.size();
 			boolean validEmail = false;
 			while (!validEmail)
 			{
-				String email = JOptionPane.showInputDialog(null,"Please enter the amail address");
-				if (email.contains.contains("@") && (email.indexOf("@") != 0) && (email.indexOf("@") != email.length()-1))
+				email = JOptionPane.showInputDialog(null,"Please enter the email address");
+				if (email.contains("@") && (email.indexOf("@") != 0) && (email.indexOf("@") != email.length()-1))
 				{
 					validEmail = true;
 				}
 			}
 			String password = generatePassword();
-			User newUser = new User(userID, validEmail, password, 2);
+			User newUser = new User(userID, email, password, 2);
 		}
 	
 	/**
@@ -351,7 +365,7 @@ public class RecCentre
 						break;
 
 					case 2:
-						viewBookings(idToEdit);
+						viewBookings();
 						break;
 
 					case 3:
@@ -406,69 +420,123 @@ public class RecCentre
 	public static void makeBooking(int idToEdit) throws IOException
 	{
 		int bookingID, facilityID, userID, slotNumber;
-		LocalDate bookingDate;
+		LocalDate bookingDate = null;
 		boolean paid;
 		boolean decommissioned;
 		String date;
 		String[] dateArray;
+		String pattern = "[0-9]{2}-[0-9]{2}-[0-9]{4}";
 		boolean validDate = false;
 		while (!validDate)
 		{
 			date = JOptionPane.showInputDialog(null, "What date would you like to make the booking for? (dd-mm-yyyy)");
-			dateArray = date.split("-");
-			bookingDate = LocalDate.of(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[1]), Integer.parseInt(dateArray[0]));
-			boolean found = false;
-			int i;
-			for (i = 0; i < facilities.size() && !found; i++)
+			if(date.matches(pattern))
 			{
-				found = (facilities.get(i).getFacilityID() == idToEdit);
+				dateArray = date.split("-");
+				try
+				{
+					bookingDate = LocalDate.of(Integer.parseInt(dateArray[2]), Integer.parseInt(dateArray[1]), Integer.parseInt(dateArray[0]));
+				}
+				catch(Exception e)
+				{
+					JOptionPane.showMessageDialog(null, "The date supplied is not a real date");
+					makeBooking(idToEdit);
+				}
+				boolean found = false;
+				int i;
+				for (i = 0; i < facilities.size() && !found; i++)
+				{
+					found = (facilities.get(i).getFacilityID() == idToEdit);
+				}
+				i--;
+				LocalDate decommissionUntil = facilities.get(i).getDecommissionedUntilLocalDate();
+				if(decommissionUntil == null)
+				{
+					if (bookingDate.isAfter(LocalDate.now()))//check that it isnt decommissioned at the time
+					{
+						validDate = true;
+						if (bookings.isEmpty())
+						{
+							bookingID = 0;
+						}
+						else
+						{
+							bookingID = (bookings.size()) + 1;
+						}
+						facilityID = idToEdit;
+						userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
+						slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n Please enter in 24 hour format between 09 and 17"));
+						slotNumber = slotNumber - 8;
+						if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
+						"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							paid = true;
+						}
+						else
+						{
+							paid = false;
+						}
+						Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
+						bookings.add(newBooking);
+						FileWriter writeBooking = new FileWriter("bookings.txt", true);
+						PrintWriter out = new PrintWriter(writeBooking);
+						out.println(newBooking);
+						JOptionPane.showMessageDialog(null, "Your booking has been successfully");
+					}
+				}
+				else
+				{
+					if (bookingDate.isAfter(LocalDate.now()) && decommissionUntil.isBefore(bookingDate))//check that it isnt decommissioned at the time
+					{
+						validDate = true;
+						if (bookings.isEmpty())
+						{
+							bookingID = 0;
+						}
+						else
+						{
+							bookingID = (bookings.size()) + 1;
+						}
+						facilityID = idToEdit;
+						userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
+						slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n Please enter in 24 hour format between 09 and 17"));
+						slotNumber = slotNumber - 8;
+						if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
+						"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+						{
+							paid = true;
+						}
+						else
+						{
+							paid = false;
+						}
+						Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
+						FileWriter writeBooking = new FileWriter("bookings.txt", true);
+						PrintWriter out = new PrintWriter(writeBooking);
+						out.println(newBooking);
+						JOptionPane.showMessageDialog(null, "Your booking has been successfully");
+					}
+				}
 			}
-			i--;
-			LocalDate decommissionUntil = facilities.get(i).getDecommissionedUntilLocalDate();
-			if (bookingDate.isAfter(LocalDate.now()) && decommissionUntil.isBefore(bookingDate))//check that it isnt decommissioned at the time
+			else
 			{
-				validDate = true;
-				if (bookings.isEmpty())
-				{
-					bookingID = 0;
-				}
-				else
-				{
-					bookingID = (bookings.size()) + 1;
-				}
-				facilityID = idToEdit;
-				userID = Integer.parseInt(JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number"));
-				slotNumber = Integer.parseInt(JOptionPane.showInputDialog(null, "What time would you like to make the booking for? /n Please enter in 24 hour format between 09 and 17"));
-				slotNumber = slotNumber - 8;
-				if (JOptionPane.showConfirmDialog(null, "Has a payment been made?",
-				"Payment", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
-				{
-					paid = true;
-				}
-				else
-				{
-					paid = false;
-				}
-				Booking newBooking = new Booking(bookingID, facilityID, userID, bookingDate, slotNumber, paid);
-				FileWriter writeBooking = new FileWriter("bookings.txt", true);
-				PrintWriter out = new PrintWriter(writeBooking);
-				out.println(newBooking);
+				JOptionPane.showMessageDialog(null, "Invalid format supplied");
 			}
 		}
 	}
 	
-	public static void viewBookings(int idToView) throws IOException
+	public static void viewBookings() throws IOException
 	{
 		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
 		int facilityID;
 		int bookingUser = 0;
 		LocalDate bookingDate, dateToView;
 		String[] dateElements;
-		String dateString = JOptionPane.showInputDialog(null, "Please enter the date you would like to view in the format dd/mm/yyyy", "Enter date");
+		String dateString = JOptionPane.showInputDialog(null, "Please enter the date you would like to view in the format dd-mm-yyyy", "Enter date");
 		String output = "";
-		if (dateString.matches("[0-9]{2}/[0-9]{{1,2}/[0-9]{4}"))
+		if (dateString.matches("[0-9]{2}-[0-9]{2}-[0-9]{4}"))
 		{
-			dateElements = dateString.split("/");
+			dateElements = dateString.split("-");
 			dateToView = LocalDate.of(Integer.parseInt(dateElements[2]), Integer.parseInt(dateElements[1]),
 									  Integer.parseInt(dateElements[0]));
 
@@ -478,7 +546,7 @@ public class RecCentre
 				{
 					facilityID = bookings.get(i).getFacilityID();
 					bookingDate = bookings.get(i).getBookingDate();
-					if (facilityID == idToView && bookingDate.isEqual(dateToView))
+					if (bookingDate.isEqual(dateToView))
 					{
 						bookingsToView.add(bookings.get(i));
 					}
@@ -637,12 +705,13 @@ public class RecCentre
 					}
 					else
 					{
-						JOptionPane.showMessageDialog(null, error1);
+						JOptionPane.showMessageDialog(null, "Returning to menu");
 					}
 				}
 				else
 				{
-					JOptionPane.showMessageDialog(null, "fuck off so");
+					JOptionPane.showMessageDialog(null, "Returning to menu");
+					mainInterface();
 				}
 	}
 			
@@ -808,16 +877,19 @@ public class RecCentre
 											else
 											{
 												JOptionPane.showMessageDialog(null, error2);
+												mainInterface();
 											}
 										}
 										else
 										{
 											JOptionPane.showMessageDialog(null, error2);
+											mainInterface();
 										}
 									}
 									else
 									{
 										JOptionPane.showMessageDialog(null, error2);
+										mainInterface();
 									}
 					}
 		}
@@ -909,6 +981,7 @@ public class RecCentre
 		else
 		{
 			JOptionPane.showMessageDialog(null, "There are no facilities to recommission");
+			mainInterface();
 		}
 	}
 	
@@ -978,11 +1051,13 @@ public class RecCentre
 					}
 					else
 					{
-						JOptionPane.showMessageDialog(null, error1);
+						JOptionPane.showMessageDialog(null, "Returning to main menu");
+						mainInterface();
 					}
 		
 		}
 		else
-		JOptionPane.showMessageDialog(null, error1);
+		JOptionPane.showMessageDialog(null, "There are no facilities to delete");
+		mainInterface();
 	}
 }
