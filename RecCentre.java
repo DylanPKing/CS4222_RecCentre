@@ -56,7 +56,7 @@ public class RecCentre
 							break;
 
 						case 4:
-							// Record payments method     needs confirmation
+							recordPayments();
 							break;
 							
 						case 5:
@@ -255,9 +255,9 @@ public class RecCentre
 					bookingID = Integer.parseInt(lineFromFile[0]);	// Fill data field variables with their respective information
 					facilityID = Integer.parseInt(lineFromFile[1]);
 					userID = Integer.parseInt(lineFromFile[2]);
-					dateElements = lineFromFile[3].split("/");		// Takes the date from file into its own array
-					bookingDate = LocalDate.of(Integer.parseInt(dateElements[2]),
-								  Integer.parseInt(dateElements[1]), Integer.parseInt(dateElements[0]));
+					dateElements = lineFromFile[3].split("-");		// Takes the date from file into its own array
+					bookingDate = LocalDate.of(Integer.parseInt(dateElements[0]),
+								  Integer.parseInt(dateElements[1]), Integer.parseInt(dateElements[2]));
 								  // COnverts the date array into an actual date
 					slotNumber = Integer.parseInt(lineFromFile[4]);
 					test = lineFromFile[5];
@@ -1123,5 +1123,62 @@ public class RecCentre
 		else
 		JOptionPane.showMessageDialog(null, "There are no facilities to delete");
 		mainInterface();
+	}
+	
+	public static void recordPayments() throws IOException
+	{
+		String [] choices = new String [bookings.size()];
+		String [] valids = {"Yes", "No"};
+		
+		String selection = "";
+		boolean found = false;
+		
+		FileWriter fr = new FileWriter("Bookings.txt", false);
+		PrintWriter pr = new PrintWriter(fr);
+							
+		for(int i = 0; i < bookings.size(); i++)															// Run through bookings
+		{
+			choices[i] = bookings.get(i).getBookingID() + "," + bookings.get(i).getFacilityID() + "," + bookings.get(i).getUserID() + "." + bookings.get(i).getBookingDate() + "," + bookings.get(i).getSlotNumber();
+		}
+		selection = (String) JOptionPane.showInputDialog(null, "Which booking are you processing payments for?", "Record Payments", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+		if(selection == null)
+		{
+			mainInterface();
+		}
+		for(int i = 0; i < bookings.size(); i++)
+		{
+			if(selection.equals(choices[i]))
+			{
+				if(bookings.get(i).getPaymentStatus())
+				{
+					JOptionPane.showMessageDialog(null, "This booking is fully paid for");
+					mainInterface();
+				}
+				else
+				{
+					String valid = (String)	JOptionPane.showInputDialog(null, "You are about to accept payment for this booking\nAre you sure you want to proceed?", "Confirmation", JOptionPane.QUESTION_MESSAGE, null, valids, valids[0]);
+					if(valid == null)
+					{
+						mainInterface();
+					}
+					else
+					{
+						bookings.get(i).setPaymentStatus(true);
+					}
+				}
+			}
+		}	
+		pr.print("");
+		fr.close();
+		pr.close();
+		fr = new FileWriter("Bookings.txt", true);
+		pr = new PrintWriter(fr);
+				
+		for(int i = 0; i < bookings.size(); i++)
+		{
+			pr.print(bookings.get(i).getBookingID() + "," + bookings.get(i).getFacilityID() + "," + bookings.get(i).getUserID() + "," + bookings.get(i).getBookingDate() + "," + bookings.get(i).getSlotNumber() + "," + bookings.get(i).getPaymentStatus());
+		}
+		fr.close();
+		pr.close();
 	}
 }
