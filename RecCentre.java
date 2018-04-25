@@ -414,13 +414,15 @@ public class RecCentre
 		 String[] endArray = endDate.split("/");
 		 LocalDate localStartDate = LocalDate.of(Integer.parseInt(startArray[2]), Integer.parseInt(startArray[1]), Integer.parseInt(startArray[0]));
 		 LocalDate localEndDate = LocalDate.of(Integer.parseInt(endArray[2]), Integer.parseInt(endArray[1]), Integer.parseInt(endArray[0]));
-		 LocalDate testDate;
-		 for (testDate = localStartDate; testDate.isBefore(localEndDate) || testDate.equals(localEndDate);)
+		 LocalDate testDate = null;
+		 if(bookings.size() != 0)
 		 {
-			 if(bookings.size() != 0)
+			 for (int i = 0; i < bookings.size(); i++)
 			 {
-				for (int i = 0; i < bookings.size(); i++)
+				for (testDate = localStartDate; testDate.isBefore(localEndDate) || testDate.equals(localEndDate);testDate = testDate.plusDays(1))
 				{
+					if(bookings.get(i).getBookingDate().equals(testDate))
+					{
 						for (int j = 1; j < 10; j++)
 						{
 							if (bookings.get(i).getSlotNumber() != j)
@@ -428,23 +430,18 @@ public class RecCentre
 								output += testDate + " at " + (j + 8) + ":00" + "\n";
 							}
 						}
+					}
 				}
 			 }
-			 else
+		 }
+		 else
+		 {
+			for(int j = 1; j < 10; j++)
 			 {
-				 for(int j = 1; j < 10; j++)
-				 {
-					 output += testDate + " at " + (8 + j) + ":00" + "\n";
-				 }
+				 output += testDate + " at " + (8 + j) + ":00" + "\n";
 			 }
-			testDate = testDate.plusDays(1);
-		}
-		if(output.equals(""))
-		{
-			putout = "All slots are booked out";
-			output = "There are no free slots the the specified date range";
-		}
-		JOptionPane.showMessageDialog(null, putout + "\n" + output);
+		 }
+	JOptionPane.showMessageDialog(null, putout + "\n" + output);
 	}
 	
 	public static void makeBooking(int idToEdit) throws IOException
