@@ -492,14 +492,7 @@ public class RecCentre
 					if (bookingDate.isAfter(LocalDate.now()))//check that it isnt decommissioned at the time
 					{
 						validDate = true;
-						if (bookings.isEmpty())
-						{
-							bookingID = 0;
-						}
-						else
-						{
-							bookingID = (bookings.size()) + 1;
-						}
+						bookingID = (bookings.size()) + 1;
 						facilityID = idToEdit;
 						temp1 = JOptionPane.showInputDialog(null, "What user is making the booking? (Please enter ID number");
 						if(temp1 == null)
@@ -535,7 +528,16 @@ public class RecCentre
 						bookings.add(newBooking);
 						FileWriter writeBooking = new FileWriter("bookings.txt", true);
 						PrintWriter out = new PrintWriter(writeBooking);
-						out.println(newBooking);
+						if (!(bookings.isEmpty()))
+						{
+							out.println();
+						}
+						out.print(bookingID + ",");
+						out.print(facilityID + ",");
+						out.print(userID + ",");
+						out.print(bookingDate + ",");
+						out.print(slotNumber + ",");
+						out.print(paid);
 						JOptionPane.showMessageDialog(null, "Your booking has been successfully");
 						out.close();
 						writeBooking.close();
