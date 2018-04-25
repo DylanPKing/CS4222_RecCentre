@@ -1177,6 +1177,7 @@ public class RecCentre
 		for(int i = 0; i < bookings.size(); i++)
 		{
 			pr.print(bookings.get(i).getBookingID() + "," + bookings.get(i).getFacilityID() + "," + bookings.get(i).getUserID() + "," + bookings.get(i).getBookingDate() + "," + bookings.get(i).getSlotNumber() + "," + bookings.get(i).getPaymentStatus());
+			pr.println();
 		}
 		fr.close();
 		pr.close();
