@@ -1,3 +1,10 @@
+/*
+ * Dylan King			17197813
+ * Szymon Sztyrmer		17200296
+ * Louise Madden		17198232
+ * Brian Malone			17198178
+ */
+
 /**
  * User
  */

@@ -1,3 +1,10 @@
+/*
+ * Dylan King			17197813
+ * Szymon Sztyrmer		17200296
+ * Louise Madden		17198232
+ * Brian Malone			17198178
+ */
+
 import java.util.*;			// Scanner
 import javax.swing.*;		// JOptionPane   +   JTextArea
 import java.io.*;			// IOException  +  Files
@@ -27,6 +34,12 @@ public class RecCentre
 		}
 	}
 	
+	/**
+	 * This method is void and takes in no parameters.
+	 * This is a main menu.
+	 * The user is returned to here when they are finished with the action they choose.
+	 * This loops until the user chooses to exit the program.
+	 */
 	public static void mainInterface() throws IOException
 	{
 		int inputNum;
@@ -141,8 +154,8 @@ public class RecCentre
 	/**
 	 * Takes in a user chosen by the administrator, and generates
 	 * a random password between 8 and 50 characters, specified by
-	 * the administrator, and writes it to the Users object.
-	 * @param newUser
+	 * the administrator, and generates a password to return.
+	 * @param password
 	 */
 	public static String generatePassword() throws IOException
 	{
@@ -182,6 +195,14 @@ public class RecCentre
 		return password;
 	}
 
+	/**
+	 * This method is void and takes in no parameters.
+	 * This method runs when the user chooses to register a new user.
+	 * It takes input in from the user in JOptionpanes.
+	 * The information input is then used to create a new object of User type, 
+	 * and add the new users information to the users ArrayList.
+	 * It also adds the user's information to the Users.txt file.
+	 */
 	public static void registerUser() throws IOException
 		{
 			String email = "";
@@ -337,6 +358,13 @@ public class RecCentre
 		return paid;
 	}
 	
+	/**
+	 * This method is void and takes in no parameters.
+	 * This method is runif the user is an admin and they choose to edit or view a facility.
+	 * The user is asked to choose a facility to edit or view.
+	 * They can then view the availability of the facility, make a booking for the facility, view existing bookings,
+	 * decommission a facility and recommission a facility.
+	 */
 	public static void editAndViewFacilities() throws IOException
 	{
 		String[] facilitiesNames = new String[facilities.size()];
@@ -402,8 +430,14 @@ public class RecCentre
 			}
 		}
 	
-
-	public static void viewFacilityAvailibilites(int idToEdit) throws IOException
+	/**
+	 * This method is void and takes in an int as a parameter.
+	 * This allows the admin to view the availabilities of the facility chosen in the editAndViewFcilities() method.
+	 * This method takes in information from the user.
+	 * The user enters the dates that they would like to check availabilities for from a start date to an end date inclusive.
+	 * It scans the bookings arraylist and compares the entries to all possible booking slots and prints the slots that do not match the bookings.
+	 */
+	public static void viewFacilityAvailibilites(int idToEdit) throws IOException 
 	{
 		 String startDate, endDate;
 		 String output = "";
@@ -444,6 +478,13 @@ public class RecCentre
 	JOptionPane.showMessageDialog(null, putout + "\n" + output);
 	}
 	
+	/**
+	 * This method is void and takes in an int as a parameter.
+	 * This method creates a new booking for the facility chosen in the editAndViewFacilities() method.
+	 * It takes in user input for the user ID of the person booking, the booking date and the time of the booking and if a payment was made.
+	 * The method generates a new booking ID from the last entry in the bookings ArrayList
+	 * It validates the passed in date that it is after the current date and is not during a period where the facility is decommissioned. 
+	 */
 	public static void makeBooking(int idToEdit) throws IOException
 	{
 		int bookingID, facilityID, userID, slotNumber;
@@ -582,7 +623,13 @@ public class RecCentre
 			}
 		}
 	}
-	
+	/** 
+	 * This method is void and takes in no parameters.
+	 * The user enters the date they would like to see the bookings for.
+	 * If the user is the admin they will see all bookings on that day.
+	 * This method also tells the admin which bookings have been paid for and which have not.
+	 * If the user is not an admin they will only see their own bookings for the day entered.
+	 */	
 	public static void viewBookings() throws IOException
 	{
 		ArrayList<Booking> bookingsToView = new ArrayList<Booking>();
@@ -652,82 +699,89 @@ public class RecCentre
 	}
 	
 	/**
-		  *	viewAccountStatement() can be called from the main
-		  * It reads the arraylists and checks the payment status of a user.
-		  * It can be accessed by both the admin and the user
-		  * If accessed by the admin, it displays all the facilities and the outstanding balances
-		  * If accessed by a user, it displays  all the outstanding balances for that user
-		  */
-		public static void viewAccountStatement() throws IOException
+	  *	viewAccountStatement() can be called from the main
+	  * It reads the arraylists and checks the payment status of a user.
+	  * It can be accessed by both the admin and the user
+	  * If accessed by the admin, it displays all the facilities and the outstanding balances
+	  * If accessed by a user, it displays  all the outstanding balances for that user
+	  */
+	public static void viewAccountStatement() throws IOException
+	{
+		String statement = "";																						// My vars
+		String pay = "";
+		String facilityCheck = "";
+		if(isAdmin)																										// If admin is logged on
 		{
-			String statement = "";																						// My vars
-			String pay = "";
-			String facilityCheck = "";
-			if(isAdmin)																										// If admin is logged on
+			for(int i = 0; i < bookings.size(); i++)															// Run through bookings
 			{
-				for(int i = 0; i < bookings.size(); i++)															// Run through bookings
+				if(bookings.get(i).getPaymentStatus())														// If paid
 				{
-					if(bookings.get(i).getPaymentStatus())														// If paid
+					for(int j = 0; j < facilities.size(); j++)													// Run through facilities
 					{
-						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+						if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
 						{
-							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
-							{
-								pay = "has been paid";								// Attach its price to pay
-								facilityCheck = facilities.get(j).getFacilityName();
-							}
+							pay = "has been paid";								// Attach its price to pay
+							facilityCheck = facilities.get(j).getFacilityName();
 						}
-					}
-					else																											// If not paid
-					{
-						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
-						{
-							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())										// Find the facility for that booking
-							{
-								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
-								facilityCheck = facilities.get(j).getFacilityName();
-							}
-						}
-					}
-					statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";	// Ammend the whole thing onto statement
-				}
-			}
-			else																													// Is not admin
-			{
-				for(int i = 0; i < bookings.size(); i++)															// Run through bookings
-				{
-					if(bookings.get(i).getPaymentStatus())														// If paid
-					{
-						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
-						{
-							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
-							{
-								pay = "has been paid";								// Attach its price to pay
-								facilityCheck = facilities.get(j).getFacilityName();
-							}
-						}
-					}
-					else																											// If not paid
-					{
-						for(int j = 0; j < facilities.size(); j++)													// Run through facilities
-						{
-							if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
-							{
-								pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
-								facilityCheck = facilities.get(j).getFacilityName();
-							}
-						}
-					}
-					if(bookings.get(i).getUserID() == (loggedInUser))																						// If used a user with matching id
-					{
-						statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";			// Amend the relevant booking to statement
 					}
 				}
+				else																											// If not paid
+				{
+					for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+					{
+						if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())										// Find the facility for that booking
+						{
+							pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
+							facilityCheck = facilities.get(j).getFacilityName();
+						}
+					}
+				}
+				statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";	// Ammend the whole thing onto statement
 			}
-			JOptionPane.showMessageDialog(null, statement);											// Show the bookings
 		}
+		else																													// Is not admin
+		{
+			for(int i = 0; i < bookings.size(); i++)															// Run through bookings
+			{
+				if(bookings.get(i).getPaymentStatus())														// If paid
+				{
+					for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+					{
+						if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
+						{
+							pay = "has been paid";								// Attach its price to pay
+							facilityCheck = facilities.get(j).getFacilityName();
+						}
+					}
+				}
+				else																											// If not paid
+				{
+					for(int j = 0; j < facilities.size(); j++)													// Run through facilities
+					{
+						if(facilities.get(j).getFacilityID() == bookings.get(i).getFacilityID())											// Find the facility for that booking
+						{
+							pay = "has an outstanding balance of: \u20AC" + facilities.get(j).getPricePerHour();									// Attach its price to pay
+							facilityCheck = facilities.get(j).getFacilityName();
+						}
+					}
+				}
+				if(bookings.get(i).getUserID() == (loggedInUser))																						// If used a user with matching id
+				{
+					statement += facilityCheck + "\t" + pay + "\tby user:" + bookings.get(i).getUserID() + "\n";			// Amend the relevant booking to statement
+				}
+			}
+		}
+		JOptionPane.showMessageDialog(null, statement);											// Show the bookings
+	}
 		
-		public static void createFacility() throws IOException
+	/**
+	 * This method is void and take in no parameters.
+	 * This method allows the admin the create a new faciity.
+	 * This method calls makeName(), makePrice() and gernerateID() to get the informatinsfor the facility.
+	 * It adds the informaton to the facilities arrayList and writes it t the Facilities.txt file.
+	 * It also allows the user to choose to crete another new facility.
+	 */
+	public static void createFacility() throws IOException
 	{
 		String input, input2, filename, error1, error2, pattern, facilityName;
 		int facilityID = 0;
@@ -745,36 +799,41 @@ public class RecCentre
 		facilityName = makeName();
 		pricePerHour = makePrice();
 		
-				facilityID = generateID();
-				facilities.add(new Facility(facilityID, facilityName, pricePerHour));
-				pr.print(facilityID +","+ facilityName +","+ pricePerHour);
-				pr.println();
-				fr.close();
-				pr.close();
-	
-			String [] choices = {"Yes", "No"};
-			String selection = (String) JOptionPane.showInputDialog(
-			null, "Would you like to create another facility?", "Create", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
-				if(selection != null)
-				{
-					if(selection.matches(choices[0]))
-					{
-						createFacility();
-					}
-					else
-					{
-						JOptionPane.showMessageDialog(null, "Returning to menu");
-					}
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null, "Returning to menu");
-					mainInterface();
-				}
+		facilityID = generateID();
+		facilities.add(new Facility(facilityID, facilityName, pricePerHour));
+		pr.print(facilityID +","+ facilityName +","+ pricePerHour);
+		pr.println();
+		fr.close();
+		pr.close();
+		String [] choices = {"Yes", "No"};
+		String selection = (String) JOptionPane.showInputDialog(
+		null, "Would you like to create another facility?", "Create", JOptionPane.QUESTION_MESSAGE, null, choices, choices[0]);
+		if(selection != null)
+		{
+			if(selection.matches(choices[0]))
+			{
+				createFacility();
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "Returning to menu");
+			}
+		}
+		else
+		{
+			JOptionPane.showMessageDialog(null, "Returning to menu");
+			mainInterface();
+		}
 	}
-			
 	
-	
+	/**
+	 * This method takes in no parameters and retuns a String.
+	 * This method takes in user input for a new facility name.
+	 * It allows the user to cancel their creation, validates that inout was provided.
+	 * This method also checks if a facility of that name already exists and asks the user to enter
+	 * a different name if this is the case.
+	 * The method returns a facilityName.
+	 */
 	public static String makeName() throws IOException
 	{
 		String facilityName = JOptionPane.showInputDialog(null, "Enter facility name");
@@ -799,6 +858,13 @@ public class RecCentre
 		return facilityName;
 	}
 	
+	/**
+	 * This method takes in no parameters and returns a double.
+	 * The user is asked to input the price per hour for their new facility.
+	 * This method allows the user to cancel their creation.
+	 * It also validates that a price was entered and it also validates that the price is in a valid format.
+	 * This method returns actualPrice.
+	 */
 	public static double makePrice() throws IOException
 	{
 		String price = JOptionPane.showInputDialog(null, "Enter the price per hour\nUse the range(0.01 - 99.99)");
@@ -823,6 +889,13 @@ public class RecCentre
 		return actualPrice;
 	}
 	
+	/**
+	 * This method takes in no parameters and returns an int.
+	 * This method generates a random number for the facility ID.
+	 * It checks that the ID generated is unique by checking if it is equal to any existing facility IDs.
+	 * If it is and the ID isn't unique the method calls itself to generate a new ID and check that again until it generates a unique ID.
+	 * This method returns uniqueID.
+	 */
 	public static int generateID()
 	{
 		int uniqueId;
@@ -838,6 +911,14 @@ public class RecCentre
 			
 	}
 	
+	/**
+	 * This metjod is void and takes in no parameters.
+	 * This method allows the user to suspend/decommission a facility.
+	 * It gives the user a list of fcilities to decommission.
+	 * It asks the user to input a date to decommission until.
+	 * This ehod also sets a decommissionedUntilLocalDate for the chosen facility object.
+	 * This added information is also added to the Facilities.txt file.
+	 */
 	public static void suspendFacility() throws IOException
 	{
 		/*string array choices, JOptionPane.QUESTION_MESSAGE, getFacilityName plug in to choices, 
@@ -882,7 +963,7 @@ public class RecCentre
 								suspendedFacilityName = facilities.get(j).getFacilityName();
 								suspendedFacilityID = facilities.get(j).getFacilityID();
 								suspendedPricePerHour = facilities.get(j).getPricePerHour();
-								//take this object and bring them back with some motherfucking dates
+								
 								dateInput = JOptionPane.showInputDialog(null, "Please supply the date you wish to decommission this facility until in the format yyyy/mm/dd");
 								//validate format
 								found = true;
@@ -955,6 +1036,14 @@ public class RecCentre
 		}
 	}
 	
+	/** 
+	 * This method is void and takes in no parameters.
+	 * This method allows the user to recommission a decommissioned facility. 
+	 * This method scans the existing facilities and allows the user to choose only from facilities that have been decommissioned.
+	 * It retains copies the information of the chosen facility except for the decommissionedUntilLocalDate
+	 * and then removes the facility from the facilities ArrayList and adds it back in using the copied information.
+	 * It then writes the updated information back into the Facilities.txt file.
+	 */
 	public static void removeSuspension() throws IOException
 	{
 		String options[];
@@ -1049,6 +1138,13 @@ public class RecCentre
 		}
 	}
 	
+	/**
+	 * This method is void and takes in no parameters.
+	 * This method allows the user to remove an existing facility.
+	 * It gives the user a choice of all existing facilities.
+	 * The user choses one and it is removed from the facilities ArrayList and 
+	 * the Facilities.txt file will be overwritten without the removed facilitiy
+	 */
 	public static void deleteFacility() throws IOException
 	{
 		//permanently delete facilities
@@ -1125,6 +1221,13 @@ public class RecCentre
 		mainInterface();
 	}
 	
+	/**
+	 * This method is void and takes in no parameters
+	 * This method allows the user to accept payment for a booking.
+	 * This changes the paymentStatus for that booking.
+	 * When the admin accepts payment for thebooking the paymentStatus for that booking is changes from false to true.
+	 * This is edited in the bookings ArrayList and the changes are written to the Bookings.txt file.
+	 */
 	public static void recordPayments() throws IOException
 	{
 		String [] choices = new String [bookings.size()];
